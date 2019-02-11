@@ -1,10 +1,15 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Scanner;
 
 public class MainClass {
-    public static void main(String[] args) throws IOException  {
+    /**
+     * The main method
+     *
+     * @param args command line arguments
+     * @throws IOException if shit hits the fan
+     */
+    public static void main(String[] args) throws IOException {
         BufferedReader sysIn = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
 
         String line;
