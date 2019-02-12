@@ -10,6 +10,7 @@ public class InvalidDiceNumberException extends Exception {
 
     /**
      * Custom error message
+     * @param str the error msg
      */
     public InvalidDiceNumberException(String str) {
         super(str);

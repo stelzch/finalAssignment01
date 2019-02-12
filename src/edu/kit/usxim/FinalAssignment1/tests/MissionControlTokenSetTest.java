@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MissionControlTokenSetTest {
 
     @Test
-    public void checkStartingTokensContain2Through7()  {
+    public void checkStartingTokensContain2Through7() {
         PlayingTokenSet pts = new MissionControlTokenSet();
 
         List<Integer> sizes = new ArrayList();
@@ -31,7 +31,7 @@ class MissionControlTokenSetTest {
 
         Collections.sort(sizes);
 
-        for (int i=2; i<=7; i++)
+        for (int i = 2; i <= 7; i++)
             assertTrue(sizes.contains(i));
     }
 
@@ -62,7 +62,7 @@ class MissionControlTokenSetTest {
         Collections.sort(proposal);
 
         System.out.println(pts);
-        for(Token t : proposal) {
+        for (Token t : proposal) {
             System.out.println("Token is: " + t.getSize());
         }
 
@@ -85,7 +85,7 @@ class MissionControlTokenSetTest {
     @Test
     public void checkProposalWhenNoTokensLeft() throws InvalidDiceNumberException {
         PlayingTokenSet pts = new MissionControlTokenSet();
-        for (int i=2; i<=7; i++)
+        for (int i = 2; i <= 7; i++)
             pts.removeToken(new Token(Token.Type.MISSION_CONTROL, i));
 
         List<Token> expected = new ArrayList<>();

@@ -4,9 +4,13 @@ package edu.kit.usxim.FinalAssignment1;
 import java.util.*;
 
 public class MissionControlTokenSet implements PlayingTokenSet {
-    /** The smallest token this set contains */
+    /**
+     * The smallest token this set contains
+     */
     public static final int MINIMUM_TOKEN_SIZE = 2;
-    /** The largest token this set contains */
+    /**
+     * The largest token this set contains
+     */
     public static final int MAXIMUM_TOKEN_SIZE = 7;
 
     private SortedSet<Token> availableTokens;
@@ -30,20 +34,9 @@ public class MissionControlTokenSet implements PlayingTokenSet {
             throw new InvalidDiceNumberException("dice number was to large");
     }
 
-    public Token getNthTokenOfSet(Set<Token> set, int n) {
-        int index = 0;
-        for (Token t : set) {
-            if (index == n)
-                return t;
-
-            index++;
-        }
-
-        throw new IndexOutOfBoundsException();
-    }
-
     /**
      * Search for the next lower token and add it to the given list if it exists
+     *
      * @param searchToken the token to search for
      */
     private void addNextLowerTokenIfExistent(Token searchToken, List<Token> result) {
@@ -63,8 +56,9 @@ public class MissionControlTokenSet implements PlayingTokenSet {
 
     /**
      * Search for the next lower token and add it to the given list if it exists
+     *
      * @param searchToken the token to search for
-     * @param result the list the next lower token should be added to if found
+     * @param result      the list the next lower token should be added to if found
      */
     private void addNextHigherTokenIfExistent(Token searchToken, List<Token> result) {
         for (Token currentToken : availableTokens) {
@@ -79,6 +73,7 @@ public class MissionControlTokenSet implements PlayingTokenSet {
 
     /**
      * Get the possible tokens for a given dice number
+     *
      * @param diceNumber the number of the dice (2...7)
      * @return a list of usable tokens
      * @throws InvalidDiceNumberException if the given dice number is invalid
@@ -111,6 +106,7 @@ public class MissionControlTokenSet implements PlayingTokenSet {
 
     /**
      * Get the iterator
+     *
      * @return an iterator of the token this class stores
      */
     @Override
@@ -118,6 +114,10 @@ public class MissionControlTokenSet implements PlayingTokenSet {
         return availableTokens.iterator();
     }
 
+    /**
+     * Get the string representation
+     * @return a space-seperated list of all sizes of tokens that are available
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
 

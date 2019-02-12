@@ -21,7 +21,7 @@ public class Board {
 
     private void setFieldsToDefault(char defaultValue) {
         for (int x = 0; x < BOARD_WIDTH; x++) {
-            for ( int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int y = 0; y < BOARD_HEIGHT; y++) {
                 board[y][x] = defaultValue;
             }
         }
@@ -29,6 +29,7 @@ public class Board {
 
     /**
      * Get the field state
+     *
      * @param x the x-coordinate
      * @param y the y-coordinate
      * @return the character representation at the given coordinates
@@ -66,10 +67,12 @@ public class Board {
 
     /**
      * Place a token at a given position
-     * @param token the token type
-     * @param x the x-coord
-     * @param y the y-coord
+     *
+     * @param token       the token type
+     * @param x           the x-coord
+     * @param y           the y-coord
      * @param orientation the token orientation
+     * @throws InvalidPlacementException if the placement is incorrect
      */
     public void placeToken(Token token, int x, int y, Token.Orientation orientation) throws InvalidPlacementException {
         int endX = x;
@@ -93,8 +96,8 @@ public class Board {
     }
 
     private boolean checkFieldsUnoccupied(int startX, int startY, int endX, int endY) {
-        assert(startX <= endX);
-        assert(startY <= endY);
+        assert (startX <= endX);
+        assert (startY <= endY);
 
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {

@@ -10,6 +10,7 @@ public class InvalidPlacementException extends Exception {
 
     /**
      * Custom error message
+     * @param str the error message
      */
     public InvalidPlacementException(String str) {
         super(str);

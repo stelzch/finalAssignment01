@@ -4,14 +4,8 @@ import edu.kit.usxim.FinalAssignment1.InvalidDiceNumberException;
 import edu.kit.usxim.FinalAssignment1.Token;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
-
-import java.lang.IllegalArgumentException;
-
-import static edu.kit.usxim.FinalAssignment1.Token.Type.CERES;
-import static edu.kit.usxim.FinalAssignment1.Token.Type.MISSION_CONTROL;
-import static edu.kit.usxim.FinalAssignment1.Token.Type.VESTA;
+import static edu.kit.usxim.FinalAssignment1.Token.Type.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TokenTest {

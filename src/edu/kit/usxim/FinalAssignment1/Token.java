@@ -2,33 +2,50 @@ package edu.kit.usxim.FinalAssignment1;
 
 
 public class Token extends Object implements Comparable<Token> {
-    /** The minimum size for a mission control token */
+    /**
+     * The minimum size for a mission control token
+     */
     private static final int MIN_MISSION_CONTROL_SIZE = 2;
 
-    /** The maximum size for a mission control token */
+    /**
+     * The maximum size for a mission control token
+     */
     private static final int MAX_MISSION_CONTROL_SIZE = 7;
 
-    /** The exact size for a vesta or ceres token */
+    /**
+     * The exact size for a vesta or ceres token
+     */
     private static final int VESTA_OR_CERES_SIZE = 1;
 
-    /** The string representation for mission control tokens */
+    /**
+     * The string representation for mission control tokens
+     */
     private static final String MISSION_CONTROL_STRING_REPR = "+";
 
 
-
     public enum Type {
-        /** The stone used by mission control */
+        /**
+         * The stone used by mission control
+         */
         MISSION_CONTROL,
-        /** The vesta playing token */
+        /**
+         * The vesta playing token
+         */
         VESTA,
-        /** The ceres playing token */
+        /**
+         * The ceres playing token
+         */
         CERES
     };
 
     public enum Orientation {
-        /** Horizontal */
+        /**
+         * Horizontal
+         */
         HORIZONTAL,
-        /** Vertical */
+        /**
+         * Vertical
+         */
         VERTICAL
     }
 
@@ -37,6 +54,7 @@ public class Token extends Object implements Comparable<Token> {
 
     /**
      * Generate a new playing token
+     *
      * @param type the type of the token
      * @param size the height in fields
      */
@@ -63,19 +81,20 @@ public class Token extends Object implements Comparable<Token> {
 
     /**
      * Check if the token size matches the given type
+     *
      * @throws IllegalArgumentException if the size does not match our type
      */
     private void checkDimensionValidity() {
         switch (type) {
             case MISSION_CONTROL:
                 if (size > MAX_MISSION_CONTROL_SIZE
-                    || size < MIN_MISSION_CONTROL_SIZE) {
+                        || size < MIN_MISSION_CONTROL_SIZE) {
                     StringBuilder errorMessage = new StringBuilder();
                     errorMessage.append("size must be inbetween ")
-                        .append(MIN_MISSION_CONTROL_SIZE)
-                        .append(" and ")
-                        .append(MIN_MISSION_CONTROL_SIZE)
-                        .append(" for mission control tokens");
+                            .append(MIN_MISSION_CONTROL_SIZE)
+                            .append(" and ")
+                            .append(MIN_MISSION_CONTROL_SIZE)
+                            .append(" for mission control tokens");
                     throw new IllegalArgumentException(errorMessage.toString());
                 }
                 break;
@@ -114,6 +133,7 @@ public class Token extends Object implements Comparable<Token> {
 
     /**
      * Compare to another object
+     *
      * @param token the other object
      * @return a number indicating which object is larger
      */
