@@ -24,6 +24,13 @@ public class Token {
         CERES
     };
 
+    public enum Orientation {
+        /** Horizontal */
+        HORIZONTAL,
+        /** Vertical */
+        VERTICAL
+    }
+
     private Type type;
     private int size;
 
