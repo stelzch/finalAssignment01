@@ -5,7 +5,6 @@ import edu.kit.usxim.FinalAssignment1.InvalidPlacementException;
 import edu.kit.usxim.FinalAssignment1.Token;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,7 +50,7 @@ class BoardTest {
         b.placeToken(c, 9, 3, Token.Orientation.HORIZONTAL);
         b.placeToken(mcSizeFour, 1, 1, Token.Orientation.VERTICAL);
         assertEquals('V', b.getTokenAt(3, 2));
-        assertEquals('+', b.getTokenAt(1,4));
+        assertEquals('+', b.getTokenAt(1, 4));
 
         for (int y = 1; y <= 4; y++)
             assertEquals('+', b.getTokenAt(1, y));
@@ -114,7 +113,7 @@ class BoardTest {
         Executable placeAtBottomRightCornerOutByOne = () -> {
             Board b = new Board();
             Token mcSix = new Token(Token.Type.MISSION_CONTROL, 6);
-            b.placeToken(mcSix, 14,6, Token.Orientation.VERTICAL);
+            b.placeToken(mcSix, 14, 6, Token.Orientation.VERTICAL);
         };
 
         Executable placeAtUpperRightCornerOutByOne = () -> {

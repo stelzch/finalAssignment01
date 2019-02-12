@@ -1,8 +1,10 @@
 package edu.kit.usxim.FinalAssignment1.tests;
 
+import edu.kit.usxim.FinalAssignment1.InvalidDiceNumberException;
 import edu.kit.usxim.FinalAssignment1.Token;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 
 import java.lang.IllegalArgumentException;
@@ -28,7 +30,7 @@ class TokenTest {
     @Test
     public void testLowerSizeBoundsMissionControl() {
         Executable negativeTokenSizeConstruction = () -> {
-          new Token(MISSION_CONTROL, -1);
+            new Token(MISSION_CONTROL, -1);
         };
 
         Executable smallTokenSizeConstruction = () -> {
@@ -68,6 +70,27 @@ class TokenTest {
 
         assertEquals(3, t.getSize());
         assertEquals(MISSION_CONTROL, t.getType());
+    }
+
+    @Test
+    public void testComparisonBetweenTokens() {
+        Token mcSix = new Token(MISSION_CONTROL, 6);
+        Token vesta = new Token(VESTA, 1);
+        Token mcTwo = new Token(MISSION_CONTROL, 2);
+
+        assertEquals(-1, mcTwo.compareTo(mcSix));
+        assertEquals(1, mcSix.compareTo(vesta));
+    }
+
+    @Test
+    public void testEquality() {
+        Token t1 = new Token(MISSION_CONTROL, 2);
+        Token t2 = new Token(MISSION_CONTROL, 2);
+        Token v = new Token(VESTA, 1);
+
+        assertTrue(t1.equals(t2));
+        assertFalse(t1.equals(new InvalidDiceNumberException()));
+        assertFalse(v.equals(t1));
     }
 
 

@@ -1,7 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
 
-public class Token {
+public class Token extends Object implements Comparable<Token> {
     /** The minimum size for a mission control token */
     private static final int MIN_MISSION_CONTROL_SIZE = 2;
 
@@ -13,6 +13,7 @@ public class Token {
 
     /** The string representation for mission control tokens */
     private static final String MISSION_CONTROL_STRING_REPR = "+";
+
 
 
     public enum Type {
@@ -111,5 +112,32 @@ public class Token {
     }
 
 
+    /**
+     * Compare to another object
+     * @param token the other object
+     * @return a number indicating which object is larger
+     */
+    @Override
+    public int compareTo(Token token) {
+        if (size < token.getSize())
+            return -1;
+        if (size > token.getSize())
+            return 1;
+
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object otherObj) {
+        if (!(otherObj instanceof Token))
+            return false;
+
+        Token other = (Token) otherObj;
+        if (size == other.getSize() && type.equals(other.getType())) {
+            return true;
+        }
+
+        return false;
+    }
 
 }
