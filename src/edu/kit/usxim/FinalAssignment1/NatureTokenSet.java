@@ -44,7 +44,7 @@ public class NatureTokenSet {
         }
     }
 
-    private void moveTokenToNewPosition(Game.GamePhase phase, int newX, int newY) throws InvalidPlacementException, IllegalAccessException {
+    private void moveTokenToNewPosition(Game.GamePhase phase, int newX, int newY) throws InvalidPlacementException {
         if (phase == Game.GamePhase.PHASE_ONE) {
             board.moveToken(vestaX, vestaY, newX, newY);
         } else {
@@ -67,10 +67,9 @@ public class NatureTokenSet {
      * @param phase the phase the game is currently in
      * @param x the x coordinate
      * @param y the y coordinate
-     * @throws InvalidPlacementException if the coordinates are incorrect
-     * @throws IllegalAccessException if the target coordinates are already inhabited
+     * @throws InvalidPlacementException if the coordinates are incorrect or the target coordinates already occupied
      */
-    public void placeVC(Game.GamePhase phase, int x, int y) throws InvalidPlacementException, IllegalAccessException {
+    public void placeVC(Game.GamePhase phase, int x, int y) throws InvalidPlacementException{
         if (hasTokenAlreadyBeenPlaced(phase)) {
             // We try to move the token
             moveTokenToNewPosition(phase, x, y);

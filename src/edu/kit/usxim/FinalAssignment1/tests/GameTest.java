@@ -1,5 +1,7 @@
-package edu.kit.usxim.FinalAssignment1;
+package edu.kit.usxim.FinalAssignment1.tests;
 
+import edu.kit.usxim.FinalAssignment1.Game;
+import edu.kit.usxim.FinalAssignment1.InvalidPlacementException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,19 +17,19 @@ class GameTest {
     @Test
     public void testStateTransition() {
         Game g = new Game();
-        assertEquals(Game.RoundState.VC_MOVEMENT_EXPECTED, g.getState());
+        assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
         g.moveToNextState();
-        assertEquals(Game.RoundState.DICE_ROLL_EXPECTED, g.getState());
+        assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
         g.moveToNextState();
-        assertEquals(Game.RoundState.TOKEN_PLACEMENT_EXPECTED, g.getState());
+        assertEquals(Game.GameState.TOKEN_PLACEMENT_EXPECTED, g.getState());
         g.moveToNextState();
-        assertEquals(Game.RoundState.VC_MOVEMENT_EXPECTED, g.getState());
+        assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
     }
 
     @Test
-    public void testBasicPlacement() throws InvalidPlacementException, IllegalAccessException {
+    public void testBasicPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidPlacementException {
         Game g = new Game();
-        assertEquals(Game.RoundState.VC_MOVEMENT_EXPECTED, g.getState());
+        assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
         g.setVC(2, 3);
         g.roll("3");
         g.place(0, 0, 2, 0);

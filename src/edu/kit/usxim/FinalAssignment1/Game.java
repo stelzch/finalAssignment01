@@ -4,7 +4,7 @@ package edu.kit.usxim.FinalAssignment1;
  * This class brings together all the other components
  */
 public class Game implements PlayerCommandExecutor {
-    public enum RoundState {
+    public enum GameState {
         /** The next move has to be a dice roll */
         DICE_ROLL_EXPECTED,
         /** The next move has to be a token placement */
@@ -13,7 +13,7 @@ public class Game implements PlayerCommandExecutor {
         VC_MOVEMENT_EXPECTED
     }
 
-    public enum Phase {
+    public enum GamePhase {
         /** The game is in the first (vesta) phase */
         PHASE_ONE,
         /** The game is in the second (ceres) phase */
@@ -26,8 +26,8 @@ public class Game implements PlayerCommandExecutor {
     private Board board;
 
 
-    private RoundState state;
-    private Phase phase;
+    private GameState state;
+    private GamePhase phase;
 
     /**
      * Default constructor
@@ -35,21 +35,20 @@ public class Game implements PlayerCommandExecutor {
     public Game() {
         tokensForPhaseOne = new MissionControlTokenSet();
         tokensForPhaseTwo = new MissionControlTokenSet();
-        natureTokenSet = new NatureTokenSet();
         board = new Board();
 
         // At the start, we are in phase one and the VC must be placed
-        phase = Phase.PHASE_ONE;
-        state = RoundState.VC_MOVEMENT_EXPECTED;
+        phase = GamePhase.PHASE_ONE;
+        state = GameState.VC_MOVEMENT_EXPECTED;
     }
 
     /**
      * If the current state does not match the expectedStateForCommand, it throws an exception
      * @param expectedStateForCommand the state the game should be in in order for the command to be run properly
      */
-    private void throwErrorIfRequestStateMismatch(RoundState expectedStateForCommand) {
+    private void throwErrorIfRequestStateMismatch(GameState expectedStateForCommand) {
         if (expectedStateForCommand != state) {
-            throw new IllegalArgumentException("this command was not expected");
+            throw new IllegalStateException("this command was not expected");
         }
     }
 
@@ -57,7 +56,7 @@ public class Game implements PlayerCommandExecutor {
     /**
      * @return the state the game is currently in
      */
-    public RoundState getState() {
+    public GameState getState() {
         return state;
     }
     /**
@@ -65,24 +64,9 @@ public class Game implements PlayerCommandExecutor {
      */
     public void moveToNextState() {
         int currentStateIndex = state.ordinal();
-        int nextStateIndex = (currentStateIndex + 1) % RoundState.values().length;
+        int nextStateIndex = (currentStateIndex + 1) % GameState.values().length;
 
-        state = RoundState.values()[nextStateIndex];
-    }
-
-    private void tryMoveVCToCoords(int dstX, int dstY) throws IllegalAccessException, InvalidPlacementException {
-        if (!natureTokenSet.coordinatesAlreadySet(phase)) {
-            // This is the first time VC is placed. Add the token to the game board
-            board.placeToken(natureTokenSet.getCurrentToken(phase), dstX, dstY, Token.Orientation.VERTICAL);
-
-            natureTokenSet.setCurrentX(dstX, phase);
-            natureTokenSet.setCurrentY(dstY, phase);
-        } else {
-            int srcX = natureTokenSet.getCurrentX(phase);
-            int srcY = natureTokenSet.getCurrentY(phase);
-
-            board.moveToken(srcX, srcY, dstX, dstY);
-        }
+        state = GameState.values()[nextStateIndex];
     }
 
     private int parseDiceSymbol(String symbol) {
@@ -109,9 +93,8 @@ public class Game implements PlayerCommandExecutor {
 
     @Override
     public String setVC(int m, int n) throws InvalidPlacementException, IllegalAccessException {
-        throwErrorIfRequestStateMismatch(RoundState.VC_MOVEMENT_EXPECTED);
+        throwErrorIfRequestStateMismatch(GameState.VC_MOVEMENT_EXPECTED);
 
-        tryMoveVCToCoords(n, m);
         moveToNextState();
 
         return "OK";
@@ -119,13 +102,14 @@ public class Game implements PlayerCommandExecutor {
 
     @Override
     public String roll(String symbol) {
-        throwErrorIfRequestStateMismatch(RoundState.DICE_ROLL_EXPECTED);
+        throwErrorIfRequestStateMismatch(GameState.DICE_ROLL_EXPECTED);
+
         return null;
     }
 
     @Override
     public String place(int x1, int y1, int x2, int y2) {
-        throwErrorIfRequestStateMismatch(RoundState.TOKEN_PLACEMENT_EXPECTED);
+        throwErrorIfRequestStateMismatch(GameState.TOKEN_PLACEMENT_EXPECTED);
         return null;
     }
 }

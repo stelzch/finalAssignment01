@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class NatureTokenSetTest {
 
     @Test
-    public void basicPlacementRoutines() {
+    public void basicPlacementRoutines() throws InvalidPlacementException{
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
 
@@ -37,7 +37,7 @@ class NatureTokenSetTest {
     }
 
     @Test
-    public void testReplacmentOfVesta() {
+    public void testReplacmentOfVesta() throws InvalidPlacementException{
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
 
@@ -49,7 +49,7 @@ class NatureTokenSetTest {
     }
 
     @Test
-    public void testInvalidMovementOfCeres() throws InvalidPlacementException {
+    public void testInvalidMovementOfCeres() throws InvalidPlacementException{
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
         b.placeToken(new Token(Token.Type.MISSION_CONTROL, 4), 6, 6, Token.Orientation.VERTICAL);

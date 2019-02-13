@@ -127,14 +127,13 @@ public class Board {
      * @param srcY the source y-coord
      * @param dstX the target x-coord
      * @param dstY the target y-coord
-     * @throws InvalidPlacementException if the coordinates are out of bounds
-     * @throws IllegalAccessException if the target field is already occupied
+     * @throws InvalidPlacementException if the coordinates are out of bounds or the target field is already occupied
      */
-    public void moveToken(int srcX, int srcY, int dstX, int dstY) throws InvalidPlacementException, IllegalAccessException {
+    public void moveToken(int srcX, int srcY, int dstX, int dstY) throws InvalidPlacementException {
         throwErrorForInvalidCoords(srcX, srcY);
         throwErrorForInvalidCoords(dstX, dstY);
         if(!checkFieldUnoccupied(dstX, dstY)) {
-            throw new IllegalAccessException("the target field is already occupied");
+            throw new InvalidPlacementException("the target field is already occupied");
         }
 
         board[dstY][dstX] = board[srcY][srcX];
