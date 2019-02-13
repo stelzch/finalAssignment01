@@ -39,7 +39,7 @@ class UtilsTest {
 
         assertEquals(901, Utils.getStraightLineLength(0, 0, 0, 900));
 
-        assertEquals(20, Utils.getStraightLineLength(3, 3, 3, 1));
+        assertEquals(3, Utils.getStraightLineLength(3, 3, 3, 1));
     }
 
 }

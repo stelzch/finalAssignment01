@@ -41,5 +41,5 @@ public interface PlayerCommandExecutor {
      * @param y2 the ending x-coordinate
      * @return status message
      */
-    String place(int x1, int y1, int x2, int y2);
+    String place(int x1, int y1, int x2, int y2) throws InvalidPlacementException;
 }

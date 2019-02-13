@@ -22,7 +22,7 @@ class NatureTokenSetTest {
     }
 
     @Test
-    public void alreadyOccupiedException() {
+    public void testAlreadyOccupiedException() {
         Executable createOverlappingSituation = () ->  {
             Board b = new Board();
             Token mcSix = new Token(Token.Type.MISSION_CONTROL, 6);
@@ -34,6 +34,20 @@ class NatureTokenSetTest {
         };
 
         assertThrows(InvalidPlacementException.class, createOverlappingSituation);
+    }
+
+    @Test
+    public void testMoveToInvalidCoordsException() {
+        Executable moveToInvalidCoords = () -> {
+            Board b = new Board();
+            NatureTokenSet nts = new NatureTokenSet(b);
+
+            nts.placeVC(Game.GamePhase.PHASE_ONE, 3, 2);
+
+            nts.placeVC(Game.GamePhase.PHASE_ONE, Integer.MAX_VALUE, 2);
+        };
+
+        assertThrows(IllegalArgumentException.class, moveToInvalidCoords);
     }
 
     @Test
