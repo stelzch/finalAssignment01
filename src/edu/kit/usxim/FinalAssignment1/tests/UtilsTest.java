@@ -33,4 +33,13 @@ class UtilsTest {
         assertThrows(IllegalArgumentException.class, getOrientationOfTiltedLine);
     }
 
+    @Test
+    public void testLineLengths() {
+        assertEquals(7, Utils.getStraightLineLength(4, 3, 4, 9));
+
+        assertEquals(901, Utils.getStraightLineLength(0, 0, 0, 900));
+
+        assertEquals(20, Utils.getStraightLineLength(3, 3, 3, 1));
+    }
+
 }
