@@ -95,13 +95,17 @@ public class Board {
         }
     }
 
+    private boolean checkFieldUnoccupied(int x, int y) {
+        return board[y][x] == UNOCCUPIED_FIELD;
+    }
+
     private boolean checkFieldsUnoccupied(int startX, int startY, int endX, int endY) {
         assert (startX <= endX);
         assert (startY <= endY);
 
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                if (board[y][x] != UNOCCUPIED_FIELD)
+                if (!checkFieldUnoccupied(x, y))
                     return false;
             }
         }
@@ -115,5 +119,43 @@ public class Board {
                 board[y][x] = c;
             }
         }
+    }
+
+    /**
+     * Move a token to a given position
+     * @param srcX the source x-coord
+     * @param srcY the source y-coord
+     * @param dstX the target x-coord
+     * @param dstY the target y-coord
+     * @throws InvalidPlacementException if the coordinates are out of bounds
+     * @throws IllegalAccessException if the target field is already occupied
+     */
+    public void moveToken(int srcX, int srcY, int dstX, int dstY) throws InvalidPlacementException, IllegalAccessException {
+        throwErrorForInvalidCoords(srcX, srcY);
+        throwErrorForInvalidCoords(dstX, dstY);
+        if(!checkFieldUnoccupied(dstX, dstY)) {
+            throw new IllegalAccessException("the target field is already occupied");
+        }
+
+        board[dstY][dstX] = board[srcY][srcX];
+        board[srcY][srcX] = UNOCCUPIED_FIELD;
+
+    }
+
+    /**
+     * Get string-representation of board
+     * @return a 11x15 string with each character representation
+     */
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                sb.append(getTokenAt(x, y));
+            }
+            sb.append("\n");
+        }
+
+        // trim needs to be called to remove the unnecessary newline at the end
+        return sb.toString().trim();
     }
 }

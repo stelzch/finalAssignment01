@@ -24,7 +24,7 @@ public interface PlayerCommandExecutor {
      * @param n the x-coordinate
      * @return status message
      */
-    String setVC(int m, int n);
+    String setVC(int m, int n) throws InvalidPlacementException, IllegalAccessException;
 
     /**
      * Signals that the dice has been rolled

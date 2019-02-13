@@ -15,7 +15,7 @@ public class Token extends Object implements Comparable<Token> {
     /**
      * The exact size for a vesta or ceres token
      */
-    private static final int VESTA_OR_CERES_SIZE = 1;
+    public static final int VESTA_OR_CERES_SIZE = 1;
 
     /**
      * The string representation for mission control tokens
