@@ -4,104 +4,81 @@ package edu.kit.usxim.FinalAssignment1;
 public class NatureTokenSet {
     private Token vesta;
     private Token ceres;
+
+    /** The coordinates of the placed tokens are needed to move them */
     private int ceresX;
     private int ceresY;
     private int vestaX;
     private int vestaY;
 
+    /** The Board the game is placed on */
+    private Board board;
+
 
     /**
      * Default constructor
+     * @param board the board the Vesta and Ceres tokens will later be placed on
      */
-    public NatureTokenSet() {
+    public NatureTokenSet(Board board) {
         vesta = new Token(Token.Type.VESTA, Token.VESTA_OR_CERES_SIZE);
         ceres = new Token(Token.Type.CERES, Token.VESTA_OR_CERES_SIZE);
+
         ceresX = -1;
         ceresY = -1;
         vestaX = -1;
         vestaY = -1;
-    }
 
-    private void throwErrorIfCoordinateUnset(int coord) throws IllegalAccessException {
-        if (coord == -1)
-            throw new IllegalAccessException("the token must be placed first");
+        this.board = board;
     }
 
     /**
-     * Get the position for a given game state
-     * @param phase the phase the game is currently in
+     * Checks whether the relevant token for the given game phase has already been placed on the board
+     * @param phase the phase the game is currently in (determines whether Vesta or Ceres is used)
+     * @return true if the relevant token is already on the board, false if it is not
      */
-    public int getCurrentX(Game.Phase phase) throws IllegalAccessException {
-        if (phase == Game.Phase.PHASE_ONE) {
-            throwErrorIfCoordinateUnset(vestaX);
-            return vestaX;
-        } else {
-            throwErrorIfCoordinateUnset(ceresX);
-            return ceresX;
-        }
-    }
-    /**
-     * Get the position for a given game state
-     * @param phase the phase the game is currently in
-     */
-    public int getCurrentY(Game.Phase phase) throws IllegalAccessException {
-        if (phase == Game.Phase.PHASE_ONE) {
-            throwErrorIfCoordinateUnset(vestaY);
-            return vestaY;
-        } else {
-            throwErrorIfCoordinateUnset(ceresY);
-            return ceresY;
-        }
-    }
-
-    /**
-     * Set the position according for the current state
-     * @param x the new x-coord
-     * @param phase the phase the game is currently in
-     */
-    public void setCurrentX(int x, Game.Phase phase) {
-        if (phase == Game.Phase.PHASE_ONE) {
-            vestaX = x;
-        } else {
-            ceresX = x;
-        }
-    }
-
-    /**
-     * Set the position according for the current state
-     * @param y the new y-coord
-     * @param phase the phase the game is currently in
-     */
-    public void setCurrentY(int y, Game.Phase phase) {
-        if (phase == Game.Phase.PHASE_ONE) {
-            vestaY = y;
-        } else {
-            ceresY = y;
-        }
-    }
-
-    /**
-     * Get the correct token for a given phase
-     * @param phase the phase the game is currently in
-     * @return a token that matches the game phase
-     */
-    public Token getCurrentToken(Game.Phase phase) {
-        if (phase == Game.Phase.PHASE_ONE) {
-            return vesta;
-        } else {
-            return ceres;
-        }
-    }
-
-    /**
-     * Check whether the coordinates have been set before
-     * @param phase the phase the game is currently in
-     */
-    public boolean coordinatesAlreadySet(Game.Phase phase) {
-        if (phase == Game.Phase.PHASE_ONE) {
+    private boolean hasTokenAlreadyBeenPlaced(Game.GamePhase phase) {
+        if (phase == Game.GamePhase.PHASE_ONE)  {
             return (vestaX != -1 && vestaY != -1);
         } else {
             return (ceresX != -1 && ceresY != -1);
         }
+    }
+
+    private void moveTokenToNewPosition(Game.GamePhase phase, int newX, int newY) throws InvalidPlacementException, IllegalAccessException {
+        if (phase == Game.GamePhase.PHASE_ONE) {
+            board.moveToken(vestaX, vestaY, newX, newY);
+        } else {
+            board.moveToken(ceresX, ceresY, newX, newY);
+        }
+    }
+
+    private void updateCoordinatesToNewPosition(Game.GamePhase phase, int newX, int newY) {
+        if (phase == Game.GamePhase.PHASE_ONE) {
+            vestaX = newX;
+            vestaY = newY;
+        } else {
+            ceresX = newX;
+            ceresY = newY;
+        }
+    }
+
+    /**
+     * Move or place the Vesta/Ceres token at the given coordinates
+     * @param phase the phase the game is currently in
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @throws InvalidPlacementException if the coordinates are incorrect
+     * @throws IllegalAccessException if the target coordinates are already inhabited
+     */
+    public void placeVC(Game.GamePhase phase, int x, int y) throws InvalidPlacementException, IllegalAccessException {
+        if (hasTokenAlreadyBeenPlaced(phase)) {
+            // We try to move the token
+            moveTokenToNewPosition(phase, x, y);
+        } else {
+            Token relevantToken = (phase == Game.GamePhase.PHASE_ONE) ? vesta : ceres;
+            board.placeToken(relevantToken, x, y, Token.Orientation.VERTICAL);
+        }
+
+        updateCoordinatesToNewPosition(phase, x, y);
     }
 }
