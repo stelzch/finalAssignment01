@@ -65,6 +65,15 @@ public class Board {
         }
     }
 
+    private void throwErrorForInvalidDawnPlacement(int x, int y, int endX, int endY) throws InvalidPlacementException {
+        // Either the start or the end must be on the field
+        if(isFieldOnBoard(x, y) || isFieldOnBoard(endX, endY)) {
+            return;
+        }
+
+        throw new InvalidPlacementException("at least one part of dawn must be on the board");
+    }
+
     /**
      * Place a token at a given position
      *
@@ -84,8 +93,12 @@ public class Board {
         if (orientation == Token.Orientation.VERTICAL)
             endY = y + token.getSize() - 1;
 
-        // Check if the coordinates are out of bounds
-        throwErrorForInvalidPlacement(x, y, endX, endY);
+        // Check if the coordinates are out of bounds, but for the DAWN token, special rules apply
+        if (token.getSize() == Token.DAWN_SIZE) {
+            throwErrorForInvalidDawnPlacement(x, y, endX, endY);
+        } else {
+            throwErrorForInvalidPlacement(x, y, endX, endY);
+        }
 
 
         if (checkFieldsUnoccupied(x, y, endX, endY)) {
@@ -99,13 +112,24 @@ public class Board {
         return board[y][x] == UNOCCUPIED_FIELD;
     }
 
+    /**
+     * Checks whether the given field is within the board bounds
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return true if the (x,y) field is inside the boards bounds
+     */
+    private boolean isFieldOnBoard(int x, int y) {
+        return (x >= 0 && x < BOARD_WIDTH) &&
+                (y >= 0 && y < BOARD_HEIGHT);
+    }
+
     private boolean checkFieldsUnoccupied(int startX, int startY, int endX, int endY) {
         assert (startX <= endX);
         assert (startY <= endY);
 
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                if (!checkFieldUnoccupied(x, y))
+                if (isFieldOnBoard(x, y) && !checkFieldUnoccupied(x, y))
                     return false;
             }
         }
@@ -113,10 +137,20 @@ public class Board {
         return true;
     }
 
+
+    /**
+     * Set all the fields between the given coordinates that reside on the board to a specific character
+     * @param c the character to set the fields to
+     * @param startX self-explanatory
+     * @param startY self-explanatory
+     * @param endX self-explanatory
+     * @param endY self-explanatory
+     */
     private void setLineOfFieldsToChar(char c, int startX, int startY, int endX, int endY) {
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                board[y][x] = c;
+                if (isFieldOnBoard(x, y))
+                    board[y][x] = c;
             }
         }
     }

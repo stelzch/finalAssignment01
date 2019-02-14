@@ -9,6 +9,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameTest {
 
+    /**
+     * Assert that the game looks like the string given in repr
+     * @param repr the expected game board representation as string
+     * @param g the game
+     */
+    private void assertGameBoardState(String repr, Game g) {
+        assertEquals(repr, g.print());
+    }
+
     @Test
     public void testInitialGameState() {
         Game g = new Game();
@@ -43,7 +52,7 @@ class GameTest {
         g.roll("3");
         g.place(0, 0, 2, 0);
 
-        String boardRepr =
+        assertGameBoardState(
                 "+++------------\n" +
                 "---------------\n" +
                 "---V-----------\n" +
@@ -54,12 +63,53 @@ class GameTest {
                 "---------------\n" +
                 "---------------\n" +
                 "---------------\n" +
-                "---------------";
+                "---------------", g);
 
         assertEquals("V", g.state(2, 3));
         assertEquals("+", g.state(0, 2));
-        assertEquals(boardRepr, g.print());
     }
+
+    @Test
+    public void testDawnPlacement() throws InvalidPlacementException, IllegalAccessException {
+        Game g = new Game();
+        g.setVC(5, 2);
+        g.roll("DAWN");
+
+        g.place(-5, 0, 1, 0);
+
+        assertGameBoardState(
+                "++-------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "--V------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------", g);
+
+        /* Try another game */
+        g = new Game();
+        g.setVC(9, 14);
+        g.roll("DAWN");
+        g.place(19, 10, 13, 10);
+
+        assertGameBoardState(
+                "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "--------------V\n" +
+                        "-------------++", g);
+    }
+
 
     @Test
     public void testExceptionWhenInvalidPlacement() {
@@ -71,7 +121,35 @@ class GameTest {
             g.place(0, 0, 6, 0);
         };
 
+        Executable placeTokenFittingRoll = () -> {
+            Game g = new Game();
+
+            g.setVC(5, 5);
+            g.roll("3");
+            g.place(0, 0, 2, 0);
+        };
+
         assertThrows(IllegalArgumentException.class, placeTokenLongerThanRoll);
+        assertDoesNotThrow(placeTokenFittingRoll);
+    }
+
+    @Test
+    public void testIllegalVestaMovement() {
+        Executable moveVestaTooLong = () -> {
+            Game g = new Game();
+            g.setVC(4, 4);
+            g.roll("DAWN");
+            g.place(0, 0, 6, 0);
+            g.setVC(8, 9); // moved much further than 7 steps
+        };
+
+        Executable moveVestaThroughMC = () -> {
+            Game g = new Game();
+            g.setVC(5, 5);
+            g.roll("DAWN");
+        };
+
+        assertThrows(IllegalArgumentException.class, moveVestaTooLong);
     }
 
 }

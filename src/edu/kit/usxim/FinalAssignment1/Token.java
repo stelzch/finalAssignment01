@@ -2,6 +2,7 @@ package edu.kit.usxim.FinalAssignment1;
 
 
 public class Token extends Object implements Comparable<Token> {
+
     /**
      * The minimum size for a mission control token
      */
@@ -11,6 +12,7 @@ public class Token extends Object implements Comparable<Token> {
      * The maximum size for a mission control token
      */
     private static final int MAX_MISSION_CONTROL_SIZE = 7;
+    public static final int DAWN_SIZE = MAX_MISSION_CONTROL_SIZE;
 
     /**
      * The exact size for a vesta or ceres token

@@ -99,9 +99,9 @@ class BoardTest {
     public void testPlacementOutOfBoard() {
         Executable placeOverRightMargin = () -> {
             Board b = new Board();
-            Token mcSeven = new Token(Token.Type.MISSION_CONTROL, 7);
+            Token mcSix = new Token(Token.Type.MISSION_CONTROL, 6);
 
-            b.placeToken(mcSeven, 10, 0, Token.Orientation.HORIZONTAL);
+            b.placeToken(mcSix, 11, 0, Token.Orientation.HORIZONTAL);
         };
 
         Executable placeAtBottomRightCorner = () -> {
@@ -126,6 +126,18 @@ class BoardTest {
         assertDoesNotThrow(placeAtBottomRightCorner);
         assertThrows(InvalidPlacementException.class, placeAtBottomRightCornerOutByOne);
         assertThrows(InvalidPlacementException.class, placeAtUpperRightCornerOutByOne);
+    }
+
+    @Test
+    public void testInvalidDawnPlacement() {
+        Executable placeDawnCompletelyOutOfBoard = () -> {
+            Board b = new Board();
+            Token dawn = new Token(Token.Type.MISSION_CONTROL, 7);
+
+            b.placeToken(dawn, 11, 15, Token.Orientation.VERTICAL);
+        };
+
+        assertThrows(InvalidPlacementException.class, placeDawnCompletelyOutOfBoard);
     }
 
 }
