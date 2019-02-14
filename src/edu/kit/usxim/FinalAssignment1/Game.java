@@ -1,7 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This class brings together all the other components
@@ -128,7 +128,7 @@ public class Game implements PlayerCommandExecutor {
         List<Token> availableTokens;
         try {
             availableTokens = getTokenSetForPhase().getPossibleTokensForDiceNumber(lastDiceRoll);
-        } catch(InvalidDiceNumberException e) {
+        } catch (InvalidDiceNumberException e) {
             throw new IllegalStateException("the last dice roll was invalid");
         }
 
@@ -187,6 +187,11 @@ public class Game implements PlayerCommandExecutor {
 
         board.placeToken(t, x, y, or);
 
+        return null;
+    }
+
+    @Override
+    public String move(Collection<ElementaryTokenMove> moves) {
         return null;
     }
 }

@@ -44,14 +44,6 @@ public class NatureTokenSet {
         }
     }
 
-    private void moveTokenToNewPosition(Game.GamePhase phase, int newX, int newY) throws InvalidPlacementException {
-        if (phase == Game.GamePhase.PHASE_ONE) {
-            board.moveToken(vestaX, vestaY, newX, newY);
-        } else {
-            board.moveToken(ceresX, ceresY, newX, newY);
-        }
-    }
-
     private void updateCoordinatesToNewPosition(Game.GamePhase phase, int newX, int newY) {
         if (phase == Game.GamePhase.PHASE_ONE) {
             vestaX = newX;
@@ -62,6 +54,10 @@ public class NatureTokenSet {
         }
     }
 
+    private Token getRelevantTokenForPhase(Game.GamePhase phase) {
+        return (phase == Game.GamePhase.PHASE_ONE) ? vesta : ceres;
+    }
+
     /**
      * Move or place the Vesta/Ceres token at the given coordinates
      * @param phase the phase the game is currently in
@@ -69,14 +65,9 @@ public class NatureTokenSet {
      * @param y the y coordinate
      * @throws InvalidPlacementException if the coordinates are incorrect or the target coordinates already occupied
      */
-    public void placeVC(Game.GamePhase phase, int x, int y) throws InvalidPlacementException{
-        if (hasTokenAlreadyBeenPlaced(phase)) {
-            // We try to move the token
-            moveTokenToNewPosition(phase, x, y);
-        } else {
-            Token relevantToken = (phase == Game.GamePhase.PHASE_ONE) ? vesta : ceres;
-            board.placeToken(relevantToken, x, y, Token.Orientation.VERTICAL);
-        }
+    public void placeVC(Game.GamePhase phase, int x, int y) throws InvalidPlacementException {
+        Token relevantToken = getRelevantTokenForPhase(phase);
+        board.placeToken(relevantToken, x, y, Token.Orientation.VERTICAL);
 
         updateCoordinatesToNewPosition(phase, x, y);
     }

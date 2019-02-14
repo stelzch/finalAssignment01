@@ -1,5 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import java.util.Collection;
+
 /**
  * The board stores the current game state
  */
@@ -67,7 +69,7 @@ public class Board {
 
     private void throwErrorForInvalidDawnPlacement(int x, int y, int endX, int endY) throws InvalidPlacementException {
         // Either the start or the end must be on the field
-        if(isFieldOnBoard(x, y) || isFieldOnBoard(endX, endY)) {
+        if (isFieldOnBoard(x, y) || isFieldOnBoard(endX, endY)) {
             return;
         }
 
@@ -119,8 +121,8 @@ public class Board {
      * @return true if the (x,y) field is inside the boards bounds
      */
     private boolean isFieldOnBoard(int x, int y) {
-        return (x >= 0 && x < BOARD_WIDTH) &&
-                (y >= 0 && y < BOARD_HEIGHT);
+        return (x >= 0 && x < BOARD_WIDTH)
+                && (y >= 0 && y < BOARD_HEIGHT);
     }
 
     private boolean checkFieldsUnoccupied(int startX, int startY, int endX, int endY) {
@@ -159,20 +161,44 @@ public class Board {
      * Move a token to a given position
      * @param srcX the source x-coord
      * @param srcY the source y-coord
-     * @param dstX the target x-coord
-     * @param dstY the target y-coord
-     * @throws InvalidPlacementException if the coordinates are out of bounds or the target field is already occupied
+     * @param move the move to execute
+     * @throws InvalidMoveException if the coordinates are out of bounds or the target field is already occupied
      */
-    public void moveToken(int srcX, int srcY, int dstX, int dstY) throws InvalidPlacementException {
+    public void executeTokenMove(int srcX, int srcY, ElementaryTokenMove move) throws InvalidMoveException {
+        int dstX = move.getDstX();
+        int dstY = move.getDstY();
         throwErrorForInvalidCoords(srcX, srcY);
         throwErrorForInvalidCoords(dstX, dstY);
-        if(!checkFieldUnoccupied(dstX, dstY)) {
-            throw new InvalidPlacementException("the target field is already occupied");
-        }
+
+        if (!checkFieldUnoccupied(dstX, dstY))
+            throw new InvalidMoveException(move);
 
         board[dstY][dstX] = board[srcY][srcX];
         board[srcY][srcX] = UNOCCUPIED_FIELD;
+    }
 
+    /**
+     * Execute the collection of moves on the token at the given position
+     * @param x the x-coordinate of the token to moves apply to
+     * @param y the y-coordinate of the token to moves apply to
+     * @param moves a collection of cohesive moves
+     * @throws InvalidMoveException if any of the moves does not comply with the elementary rules
+     */
+    public void executeMoves(int x, int y, Collection<ElementaryTokenMove> moves) throws InvalidMoveException {
+        if (checkFieldUnoccupied(x, y))
+            throw new IllegalArgumentException("the starting coordinates were incorrect");
+
+        int fromX = x;
+        int fromY = y;
+        for (ElementaryTokenMove move : moves) {
+            if (!checkFieldUnoccupied(move.getDstX(), move.getDstY()))
+                throw new InvalidMoveException(move);
+
+            executeTokenMove(fromX, fromY, move);
+
+            fromX = move.getDstX();
+            fromY = move.getDstY();
+        }
     }
 
     /**

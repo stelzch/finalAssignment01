@@ -1,5 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import java.util.Collection;
+
 /**
  * This interface specifies all the commands the user can enter
  */
@@ -23,6 +25,8 @@ public interface PlayerCommandExecutor {
      * @param m the y-coordinate
      * @param n the x-coordinate
      * @return status message
+     * @throws InvalidPlacementException if the placement was illegal
+     * @throws IllegalAccessException if the target token is already occupied
      */
     String setVC(int m, int n) throws InvalidPlacementException, IllegalAccessException;
 
@@ -40,6 +44,14 @@ public interface PlayerCommandExecutor {
      * @param x2 the ending x-coordinate
      * @param y2 the ending x-coordinate
      * @return status message
+     * @throws InvalidPlacementException if the placement was illegal
      */
     String place(int x1, int y1, int x2, int y2) throws InvalidPlacementException;
+
+    /**
+     * Execute the provided elementary moves one after the other
+     * @param moves a collection moves to execute
+     * @return status message
+     */
+    String move(Collection<ElementaryTokenMove> moves);
 }
