@@ -3,6 +3,7 @@ package edu.kit.usxim.FinalAssignment1;
 public class InvalidMoveException extends Exception {
     /**
      * Create a new InvalidMoveException
+     * @param s
      */
     public InvalidMoveException() {
         super("the move was invalid");
@@ -16,11 +17,20 @@ public class InvalidMoveException extends Exception {
         super(generateErrorMessage(move));
     }
 
+    /**
+     * Generate the exception with a custom error message
+     * @param msg the error message
+     */
+    public InvalidMoveException(String msg) {
+        super(msg);
+    }
+
     private static String generateErrorMessage(ElementaryTokenMove move) {
         StringBuilder sb = new StringBuilder("the move to ");
         sb.append(move);
         sb.append(" was illegal");
         return sb.toString();
     }
+
 
 }

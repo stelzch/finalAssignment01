@@ -18,6 +18,15 @@ class BoardTest {
     }
 
     @Test
+    public void testFieldUnoccupied() throws InvalidPlacementException {
+        Board b = new Board();
+        b.placeToken(new Token(Token.Type.VESTA, 1), 5,4, Token.Orientation.HORIZONTAL);
+
+        assertTrue(b.checkFieldUnoccupied(0, 0));
+        assertFalse(b.checkFieldUnoccupied(5, 4));
+    }
+
+    @Test
     public void testGetFieldState() {
         Board b = new Board();
 
@@ -28,10 +37,12 @@ class BoardTest {
     public void testFieldBounds() {
         Executable accessOutOfBounds = () -> {
             Board b = new Board();
+            assertFalse(b.isFieldOnBoard(11, 15));
             char c = b.getTokenAt(11, 15);
         };
         Executable accessOutOfBoundsNegative = () -> {
             Board b = new Board();
+            assertFalse(b.isFieldOnBoard(-1, 2));
             char c = b.getTokenAt(-1, 2);
         };
 
