@@ -4,77 +4,84 @@ import edu.kit.usxim.FinalAssignment1.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import javax.xml.bind.Element;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ElementaryTokenMoveTest {
+
     @Test
-    public void testBasicElementaryMoves() throws InvalidPlacementException, InvalidMoveException {
-        Board b = new Board();
-        b.placeToken(new Token(Token.Type.CERES, 1), 5, 4, Token.Orientation.VERTICAL);
-        assertEquals('C', b.getTokenAt(5, 4));
-
-        List<ElementaryTokenMove> moves = new ArrayList<>();
-        moves.add(new ElementaryTokenMove(5, 5));
-
-        b.executeMoves(5, 4, moves);
-
-        assertEquals('C', b.getTokenAt(5, 5));
+    public void testStringRepresentation() {
+        ElementaryTokenMove move = new ElementaryTokenMove(555, 2343);
+        assertEquals("2343;555", move.toString());
     }
 
     @Test
-    public void testErrorOnIllegalMove() {
-        Executable performIllegalMove = () -> {
-            Board b = new Board();
-            b.placeToken(new Token(Token.Type.CERES, 1), 5, 4, Token.Orientation.VERTICAL);
+    public void testEquality() {
+        ElementaryTokenMove move1 = new ElementaryTokenMove(4, 5);
+        ElementaryTokenMove move2 = new ElementaryTokenMove(5, 5);
+        ElementaryTokenMove move3 = new ElementaryTokenMove(4, 5);
 
-            List<ElementaryTokenMove> moves = new ArrayList<>();
-
-            moves.add(new ElementaryTokenMove(9, 9));
-
-            b.executeMoves(5, 4, moves);
-        };
-
-        assertThrows(InvalidMoveException.class, performIllegalMove);
+        assertTrue(move1.equals(move3));
+        assertFalse(move1.equals(move2));
     }
 
     @Test
-    public void testIllegalMoveThroughOtherToken() throws InvalidPlacementException {
-        Board b = new Board();
-        b.placeToken(new Token(Token.Type.CERES, 1), 2, 2, Token.Orientation.VERTICAL);
-        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 6), 0, 3, Token.Orientation.VERTICAL);
+    public void testNeighbours() {
+        ElementaryTokenMove move1 = new ElementaryTokenMove(4, 5);
+        ElementaryTokenMove move2 = new ElementaryTokenMove(5, 5);
+        ElementaryTokenMove move3 = new ElementaryTokenMove(5, 6);
 
-        List<ElementaryTokenMove> moves = new ArrayList();
-        moves.add(new ElementaryTokenMove(3, 2));
-        moves.add(new ElementaryTokenMove(3, 3));
-        moves.add(new ElementaryTokenMove(3, 4));
+        assertTrue(move1.isConnectedTo(move2));
+        assertFalse(move1.isConnectedTo(move3));
+        assertTrue(move2.isConnectedTo(move3));
+    }
 
-        try {
-            b.executeMoves(2, 2, moves);
-        } catch (InvalidMoveException e) {
-            assertEquals("the move to 3;3 was illegal", e.getMessage());
+    @Test
+    public void testReflexivity() {
+        for (int i = 0; i < 8; i++) {
+            Random rnd = new Random();
+
+            int x = Math.abs(rnd.nextInt());
+            int y = Math.abs(rnd.nextInt());
+            ElementaryTokenMove move = new ElementaryTokenMove(x, y);
+            ElementaryTokenMove move2 = new ElementaryTokenMove(x, y);
+
+            assertTrue(move.isConnectedTo(move2));
         }
-
-        fail("no error was thrown although an illegal move was provided");
     }
 
     @Test
-    public void testLegalMove() throws InvalidPlacementException, InvalidMoveException {
-        Board b = new Board();
-        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 7), 10, 9, Token.Orientation.HORIZONTAL);
-        b.placeToken(new Token(Token.Type.CERES, 1), 10, 10, Token.Orientation.VERTICAL);
-        assertEquals('C', b.getTokenAt(10, 10));
+    public void testSymmetry() {
+        for (int i = 0; i < 500; i++) {
+            Random rnd = new Random();
 
-        List<ElementaryTokenMove> moves = new ArrayList<>();
-        moves.add(new ElementaryTokenMove(9, 9));
-        moves.add(new ElementaryTokenMove(9, 8));
-        moves.add(new ElementaryTokenMove(10, 8));
+            int x1 = Math.abs(rnd.nextInt());
+            int x2 = Math.abs(rnd.nextInt());
+            int y1 = Math.abs(rnd.nextInt());
+            int y2 = Math.abs(rnd.nextInt());
 
-        b.executeMoves(9, 10, moves);
+            ElementaryTokenMove move1 = new ElementaryTokenMove(x1, y1);
+            ElementaryTokenMove move2 = new ElementaryTokenMove(x2, y2);
 
-        assertEquals('-', b.getTokenAt(10, 10));
-        assertEquals('C', b.getTokenAt(10, 8));
+            assertEquals(move1.isConnectedTo(move2), move2.isConnectedTo(move1));
+        }
+    }
+
+    @Test
+    public void testDiagonalMoves() {
+        ElementaryTokenMove center = new ElementaryTokenMove(7, 5);
+        ElementaryTokenMove upperLeft = new ElementaryTokenMove(6, 4);
+        ElementaryTokenMove upperRight = new ElementaryTokenMove(8, 4);
+        ElementaryTokenMove lowerLeft = new ElementaryTokenMove(6, 6);
+        ElementaryTokenMove lowerRight = new ElementaryTokenMove(8, 6);
+
+        assertFalse(upperLeft.isConnectedTo(center));
+        assertFalse(upperRight.isConnectedTo(center));
+        assertFalse(lowerLeft.isConnectedTo(center));
+        assertFalse(lowerRight.isConnectedTo(center));
     }
 }
