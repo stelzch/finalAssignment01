@@ -1,6 +1,5 @@
 package edu.kit.usxim.FinalAssignment1;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -9,6 +8,8 @@ import java.util.List;
 public class Game implements PlayerCommandExecutor {
     private static final int DICE_NOT_YET_ROLLED = -1;
     public enum GameState {
+        /** The initial state: VC has to be placed */
+        VC_PLACEMENT_EXPECTED,
         /** The next move has to be a dice roll */
         DICE_ROLL_EXPECTED,
         /** The next move has to be a token placement */
@@ -46,7 +47,7 @@ public class Game implements PlayerCommandExecutor {
 
         // At the start, we are in phase one and the VC must be placed
         phase = GamePhase.PHASE_ONE;
-        state = GameState.VC_MOVEMENT_EXPECTED;
+        state = GameState.VC_PLACEMENT_EXPECTED;
 
         // Make it invalid to signal no dice has been rolled yet
         lastDiceRoll = DICE_NOT_YET_ROLLED;
@@ -85,6 +86,10 @@ public class Game implements PlayerCommandExecutor {
         int nextStateIndex = (currentStateIndex + 1) % GameState.values().length;
 
         state = GameState.values()[nextStateIndex];
+
+        // Skip the VC_PLACEMENT state, as it only is expected initially
+        if (state == GameState.VC_PLACEMENT_EXPECTED)
+            state = GameState.DICE_ROLL_EXPECTED;
     }
 
     /**
@@ -153,7 +158,7 @@ public class Game implements PlayerCommandExecutor {
 
     @Override
     public String setVC(int m, int n) throws InvalidPlacementException, IllegalAccessException {
-        throwErrorIfRequestStateMismatch(GameState.VC_MOVEMENT_EXPECTED);
+        throwErrorIfRequestStateMismatch(GameState.VC_PLACEMENT_EXPECTED);
         natureTokenSet.placeVC(phase, n, m);
 
         moveToNextState();
@@ -187,11 +192,24 @@ public class Game implements PlayerCommandExecutor {
 
         board.placeToken(t, x, y, or);
 
-        return null;
+        moveToNextState();
+
+        return "OK";
     }
 
     @Override
-    public String move(Collection<ElementaryTokenMove> moves) {
-        return null;
+    public String move(List<ElementaryTokenMove> moves) throws InvalidMoveException {
+        throwErrorIfRequestStateMismatch(GameState.VC_MOVEMENT_EXPECTED);
+        throwErrorIfDiceNumberUnset();
+
+        int stepsRequiredForMove = natureTokenSet.countStepsAndCheckIfLegal(phase, moves);
+        if (stepsRequiredForMove != lastDiceRoll)
+            throw new InvalidMoveException("this step requires a dice roll of " + stepsRequiredForMove);
+
+        natureTokenSet.moveVC(phase, moves);
+
+        moveToNextState();
+
+        return "OK";
     }
 }

@@ -1,9 +1,14 @@
 package edu.kit.usxim.FinalAssignment1.tests;
 
+import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
 import edu.kit.usxim.FinalAssignment1.Game;
+import edu.kit.usxim.FinalAssignment1.InvalidMoveException;
 import edu.kit.usxim.FinalAssignment1.InvalidPlacementException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,13 +32,15 @@ class GameTest {
     @Test
     public void testStateTransition() {
         Game g = new Game();
-        assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
+        assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
         g.moveToNextState();
         assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
         g.moveToNextState();
         assertEquals(Game.GameState.TOKEN_PLACEMENT_EXPECTED, g.getState());
         g.moveToNextState();
         assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
+        g.moveToNextState();
+        assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
     }
 
     @Test
@@ -47,7 +54,7 @@ class GameTest {
     @Test
     public void testBasicPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidPlacementException {
         Game g = new Game();
-        assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
+        assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
         g.setVC(2, 3);
         g.roll("3");
         g.place(0, 0, 2, 0);
@@ -140,7 +147,20 @@ class GameTest {
             g.setVC(4, 4);
             g.roll("DAWN");
             g.place(0, 0, 6, 0);
-            g.setVC(8, 9); // moved much further than 7 steps
+
+            List<ElementaryTokenMove> moves = new ArrayList<ElementaryTokenMove>();
+            moves.add(new ElementaryTokenMove(5, 4));
+            moves.add(new ElementaryTokenMove(5, 5));
+            moves.add(new ElementaryTokenMove(5, 6));
+            moves.add(new ElementaryTokenMove(6, 6));
+            moves.add(new ElementaryTokenMove(7, 6));
+            moves.add(new ElementaryTokenMove(7, 7));
+            moves.add(new ElementaryTokenMove(7, 8));
+
+            // This step is not allowed
+            moves.add(new ElementaryTokenMove(7, 9));
+
+            g.move(moves);
         };
 
         Executable moveVestaThroughMC = () -> {
@@ -149,7 +169,7 @@ class GameTest {
             g.roll("DAWN");
         };
 
-        assertThrows(IllegalArgumentException.class, moveVestaTooLong);
+        assertThrows(InvalidMoveException.class, moveVestaTooLong);
     }
 
 }

@@ -1,6 +1,6 @@
 package edu.kit.usxim.FinalAssignment1;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * This interface specifies all the commands the user can enter
@@ -53,5 +53,5 @@ public interface PlayerCommandExecutor {
      * @param moves a collection moves to execute
      * @return status message
      */
-    String move(Collection<ElementaryTokenMove> moves);
+    String move(List<ElementaryTokenMove> moves) throws InvalidMoveException;
 }
