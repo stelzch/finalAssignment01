@@ -7,6 +7,7 @@ import java.util.List;
  */
 public class Game implements PlayerCommandExecutor {
     private static final int DICE_NOT_YET_ROLLED = -1;
+    private static final int NUMBER_OF_ROUNDS_PER_PHASE = 6;
     public enum GameState {
         /** The initial state: VC has to be placed */
         VC_PLACEMENT_EXPECTED,
@@ -35,6 +36,7 @@ public class Game implements PlayerCommandExecutor {
     private GamePhase phase;
 
     private int lastDiceRoll;
+    private int currentRound;
 
     /**
      * Default constructor
@@ -51,6 +53,7 @@ public class Game implements PlayerCommandExecutor {
 
         // Make it invalid to signal no dice has been rolled yet
         lastDiceRoll = DICE_NOT_YET_ROLLED;
+        currentRound = 0;
     }
 
     /**
@@ -88,8 +91,17 @@ public class Game implements PlayerCommandExecutor {
         state = GameState.values()[nextStateIndex];
 
         // Skip the VC_PLACEMENT state, as it only is expected initially
-        if (state == GameState.VC_PLACEMENT_EXPECTED)
+        if (state == GameState.VC_PLACEMENT_EXPECTED && currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1)) {
+            // Start the next round
+            System.out.println("new round");
+            currentRound = 0;
+            phase = GamePhase.PHASE_TWO;
+            return;
+        }
+        if (state == GameState.VC_PLACEMENT_EXPECTED) {
             state = GameState.DICE_ROLL_EXPECTED;
+            currentRound += 1;
+        }
     }
 
     /**
@@ -127,22 +139,23 @@ public class Game implements PlayerCommandExecutor {
      */
     private Token getTokenForDiceNumber(int anticipatedTokenSize) {
         throwErrorIfDiceNumberUnset();
-        if (anticipatedTokenSize != lastDiceRoll)
-            throw new IllegalArgumentException("the requested token size does not equal to the last roll");
-
         List<Token> availableTokens;
         try {
             availableTokens = getTokenSetForPhase().getPossibleTokensForDiceNumber(lastDiceRoll);
+
+            StringBuilder sb = new StringBuilder();
+            for (Token possibleToken : availableTokens) {
+                sb.append(possibleToken.getSize());
+                sb.append(" ");
+                if (possibleToken.getSize() == anticipatedTokenSize) {
+                    return possibleToken;
+                }
+            }
+
+            throw new IllegalArgumentException("no token of that size left, currently available: " + sb.toString());
         } catch (InvalidDiceNumberException e) {
             throw new IllegalStateException("the last dice roll was invalid");
         }
-
-        for (Token t : availableTokens) {
-            if (t.getSize() == anticipatedTokenSize)
-                return t;
-        }
-
-        throw new IllegalArgumentException("there is no token left with the requested size");
     }
 
     @Override
@@ -191,6 +204,7 @@ public class Game implements PlayerCommandExecutor {
         int y = Math.min(y1, y2);
 
         board.placeToken(t, x, y, or);
+        getTokenSetForPhase().removeToken(t);
 
         moveToNextState();
 
@@ -203,7 +217,7 @@ public class Game implements PlayerCommandExecutor {
         throwErrorIfDiceNumberUnset();
 
         int stepsRequiredForMove = natureTokenSet.countStepsAndCheckIfLegal(phase, moves);
-        if (stepsRequiredForMove != lastDiceRoll)
+        if (stepsRequiredForMove > lastDiceRoll)
             throw new InvalidMoveException("this step requires a dice roll of " + stepsRequiredForMove);
 
         natureTokenSet.moveVC(phase, moves);

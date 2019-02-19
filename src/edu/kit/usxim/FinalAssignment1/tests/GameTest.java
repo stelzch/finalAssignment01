@@ -6,6 +6,7 @@ import edu.kit.usxim.FinalAssignment1.InvalidMoveException;
 import edu.kit.usxim.FinalAssignment1.InvalidPlacementException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,15 +33,22 @@ class GameTest {
     @Test
     public void testStateTransition() {
         Game g = new Game();
+
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
         g.moveToNextState();
-        assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
-        g.moveToNextState();
-        assertEquals(Game.GameState.TOKEN_PLACEMENT_EXPECTED, g.getState());
-        g.moveToNextState();
-        assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
-        g.moveToNextState();
-        assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
+
+        for (int i=1; i <= 6; i++) {
+            System.out.println("Round " + i);
+            assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
+            g.moveToNextState();
+            assertEquals(Game.GameState.TOKEN_PLACEMENT_EXPECTED, g.getState());
+            g.moveToNextState();
+            assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
+            g.moveToNextState();
+        }
+
+        assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
+
     }
 
     @Test
@@ -172,4 +180,136 @@ class GameTest {
         assertThrows(InvalidMoveException.class, moveVestaTooLong);
     }
 
+    @Test
+    public void testSimpleMovement() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException {
+        Game g = new Game();
+        List<ElementaryTokenMove> moveOneStepForward = new ArrayList<>();
+        List<ElementaryTokenMove> moveOneStepBack = new ArrayList<>();
+
+        moveOneStepForward.add(new ElementaryTokenMove(1, 0));
+        moveOneStepBack.add(new ElementaryTokenMove(0, 0));
+
+        g.setVC(0, 0);
+        g.roll("2");
+        g.place(5, 0, 5, 1);
+        g.move(moveOneStepForward);
+
+        assertEquals("V", g.state(0, 1));
+
+        g.roll("2");
+        g.place(6, 0, 6, 2);
+        g.move(moveOneStepBack);
+
+        System.out.println("Gamestate: " + g.print());
+        assertEquals("V", g.state(0, 0));
+    }
+
+    @Test
+    public void testMultiplePhases() throws InvalidPlacementException, InvalidMoveException, IllegalAccessException {
+        Game g = new Game();
+        List<ElementaryTokenMove> moveOneStepForward = new ArrayList<>();
+        List<ElementaryTokenMove> moveOneStepBack = new ArrayList<>();
+        List<ElementaryTokenMove> moveToThirdPos = new ArrayList<>();
+
+        moveOneStepForward.add(new ElementaryTokenMove(1, 0));
+        moveOneStepBack.add(new ElementaryTokenMove(0, 0));
+        moveToThirdPos.add(new ElementaryTokenMove(2, 0));
+
+
+        // Round 1
+        g.setVC(0, 0);
+        for (int round = 2; round <= 7; round++) {
+            g.roll((round == 7) ? "DAWN" : String.valueOf(round));
+            g.place(0, round, round - 1, round);
+
+            g.move((round % 2 == 0) ? moveOneStepForward : moveOneStepBack);
+        }
+        assertGameBoardState(
+                "V--------------\n" +
+                        "---------------\n" +
+                        "++-------------\n" +
+                        "+++------------\n" +
+                        "++++-----------\n" +
+                        "+++++----------\n" +
+                        "++++++---------\n" +
+                        "+++++++--------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------", g);
+
+        // Round 2
+        g.setVC(0, 1);
+        for (int round = 2; round <= 7; round++) {
+            g.roll((round == 7) ? "DAWN" : String.valueOf(round));
+            g.place(14, round, 14 - (round - 1), round);
+
+            g.move((round % 2 == 0) ? moveToThirdPos : moveOneStepForward);
+        }
+        assertGameBoardState(
+                "VC-------------\n" +
+                        "---------------\n" +
+                        "++-----------++\n" +
+                        "+++---------+++\n" +
+                        "++++-------++++\n" +
+                        "+++++-----+++++\n" +
+                        "++++++---++++++\n" +
+                        "+++++++-+++++++\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------", g);
+
+        //fail("This test needs to be written");
+    }
+
+    @Test
+    public void testVestaMovementMinimum() throws InvalidPlacementException, IllegalAccessException {
+        Executable moveWithEmptyList = () -> {
+            Game g = new Game();
+            g.setVC(0, 0);
+
+            g.roll("DAWN");
+            g.place(1, 0, 1+7, 0);
+            g.move(new ArrayList<ElementaryTokenMove>());
+        };
+
+        Executable moveWithSameCoordsList = () -> {
+            Game g = new Game();
+            g.setVC(0, 0);
+
+            g.roll("DAWN");
+            g.place(1, 0, 1+7, 0);
+
+            List<ElementaryTokenMove> moves  = new ArrayList<>();
+            moves.add(new ElementaryTokenMove(0, 0));
+            moves.add(new ElementaryTokenMove(0, 0));
+            g.move(moves);
+        };
+
+        assertThrows(InvalidMoveException.class, moveWithEmptyList);
+        assertThrows(InvalidMoveException.class, moveWithSameCoordsList);
+    }
+
+    private List<ElementaryTokenMove> getListForSingleMove(ElementaryTokenMove move) {
+        List<ElementaryTokenMove> list = new ArrayList<>();
+        list.add(move);
+        return list;
+    }
+    @Test
+    public void testImmovableVesta() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException {
+        Game g = new Game();
+        g.setVC(1,0);
+        g.roll("2");
+        g.place(1, 0, 2, 0);
+        g.move(getListForSingleMove(new ElementaryTokenMove(0, 0)));
+        assertEquals("V", g.state(0, 0));
+
+        g.roll("2");
+        g.place(0, 1, 0, 3);
+
+        try {
+            g.roll("2");
+        } catch (IllegalStateException e) {
+            fail("as vesta can not be moved the vesta movement step should be skipped");
+        }
+    }
 }

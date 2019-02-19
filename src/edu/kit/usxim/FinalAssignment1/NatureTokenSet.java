@@ -186,5 +186,6 @@ public class NatureTokenSet {
         ElementaryTokenMove initialMove = getInitialMoveForPhase(phase);
         ElementaryTokenMove lastMove = moves.get(moves.size() - 1);
         board.moveToken(initialMove.getDstX(), initialMove.getDstY(), lastMove.getDstX(), lastMove.getDstY());
+        updateCoordinatesToNewPosition(phase, lastMove.getDstX(), lastMove.getDstY());
     }
 }
