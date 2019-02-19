@@ -81,6 +81,11 @@ public class Game implements PlayerCommandExecutor {
     public GameState getState() {
         return state;
     }
+
+    private boolean shouldMoveToNextRound() {
+        return state == GameState.VC_PLACEMENT_EXPECTED &&
+                currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1);
+    }
     /**
      * Move the game to the next state
      */
@@ -91,9 +96,7 @@ public class Game implements PlayerCommandExecutor {
         state = GameState.values()[nextStateIndex];
 
         // Skip the VC_PLACEMENT state, as it only is expected initially
-        if (state == GameState.VC_PLACEMENT_EXPECTED && currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1)) {
-            // Start the next round
-            System.out.println("new round");
+        if (shouldMoveToNextRound()) {
             currentRound = 0;
             phase = GamePhase.PHASE_TWO;
             return;

@@ -50,8 +50,6 @@ public class MissionControlTokenSet implements PlayingTokenSet {
 
         if (lastTokenLowerThanSearch != null)
             result.add(lastTokenLowerThanSearch);
-
-        System.out.println("LowerToken = " + lastTokenLowerThanSearch);
     }
 
     /**
@@ -64,7 +62,6 @@ public class MissionControlTokenSet implements PlayingTokenSet {
         for (Token currentToken : availableTokens) {
             boolean currentTokenisBiggerThanSearch = currentToken.compareTo(searchToken) == 1;
             if (currentTokenisBiggerThanSearch) {
-                System.out.println("token+" + currentToken.getSize());
                 result.add(currentToken);
                 return;
             }
@@ -85,7 +82,6 @@ public class MissionControlTokenSet implements PlayingTokenSet {
         List<Token> possibleTokens = new ArrayList<Token>();
 
         Token searchToken = new Token(Token.Type.MISSION_CONTROL, diceNumber);
-        System.out.println("searchTokenSize: " + searchToken.getSize());
 
         if (availableTokens.contains(searchToken)) {
             possibleTokens.add(searchToken);
