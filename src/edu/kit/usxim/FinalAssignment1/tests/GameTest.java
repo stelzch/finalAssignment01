@@ -31,11 +31,12 @@ class GameTest {
     }
 
     @Test
-    public void testStateTransition() {
+    public void testStateTransition() throws InvalidPlacementException, IllegalAccessException {
         Game g = new Game();
 
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
-        g.moveToNextState();
+
+        g.setVC(0, 0);
 
         for (int i=1; i <= 6; i++) {
             System.out.println("Round " + i);
@@ -268,7 +269,7 @@ class GameTest {
             g.setVC(0, 0);
 
             g.roll("DAWN");
-            g.place(1, 0, 1+7, 0);
+            g.place(1, 0, 1+6, 0);
             g.move(new ArrayList<ElementaryTokenMove>());
         };
 
@@ -277,7 +278,7 @@ class GameTest {
             g.setVC(0, 0);
 
             g.roll("DAWN");
-            g.place(1, 0, 1+7, 0);
+            g.place(1, 0, 1+6, 0);
 
             List<ElementaryTokenMove> moves  = new ArrayList<>();
             moves.add(new ElementaryTokenMove(0, 0));

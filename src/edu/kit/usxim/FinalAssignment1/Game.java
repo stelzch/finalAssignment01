@@ -83,17 +83,21 @@ public class Game implements PlayerCommandExecutor {
     }
 
     private boolean shouldMoveToNextRound() {
-        return state == GameState.VC_PLACEMENT_EXPECTED &&
-                currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1);
+        return state == GameState.VC_PLACEMENT_EXPECTED
+                && currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1);
+    }
+
+    private GameState getNextState() {
+        int currentStateIndex = state.ordinal();
+        int nextStateIndex = (currentStateIndex + 1) % GameState.values().length;
+
+        return GameState.values()[nextStateIndex];
     }
     /**
      * Move the game to the next state
      */
     public void moveToNextState() {
-        int currentStateIndex = state.ordinal();
-        int nextStateIndex = (currentStateIndex + 1) % GameState.values().length;
-
-        state = GameState.values()[nextStateIndex];
+        state = getNextState();
 
         // Skip the VC_PLACEMENT state, as it only is expected initially
         if (shouldMoveToNextRound()) {
@@ -101,10 +105,21 @@ public class Game implements PlayerCommandExecutor {
             phase = GamePhase.PHASE_TWO;
             return;
         }
+
+        if (state == GameState.VC_MOVEMENT_EXPECTED && !vcCanStillMove()) {
+            // Vesta or Ceres cant move, so skip this step
+            moveToNextState();
+            return;
+        }
+
         if (state == GameState.VC_PLACEMENT_EXPECTED) {
             state = GameState.DICE_ROLL_EXPECTED;
             currentRound += 1;
         }
+    }
+
+    private boolean vcCanStillMove() {
+        return natureTokenSet.getNumOfReachableFields(phase) > 0;
     }
 
     /**
@@ -218,6 +233,9 @@ public class Game implements PlayerCommandExecutor {
     public String move(List<ElementaryTokenMove> moves) throws InvalidMoveException {
         throwErrorIfRequestStateMismatch(GameState.VC_MOVEMENT_EXPECTED);
         throwErrorIfDiceNumberUnset();
+
+        if (moves.size() == 0)
+            throw new InvalidMoveException("need to specify at least move");
 
         int stepsRequiredForMove = natureTokenSet.countStepsAndCheckIfLegal(phase, moves);
         if (stepsRequiredForMove > lastDiceRoll)

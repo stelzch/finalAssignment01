@@ -188,4 +188,24 @@ public class NatureTokenSet {
         board.moveToken(initialMove.getDstX(), initialMove.getDstY(), lastMove.getDstX(), lastMove.getDstY());
         updateCoordinatesToNewPosition(phase, lastMove.getDstX(), lastMove.getDstY());
     }
+
+    /**
+     * Calculate the number of fields that are reachable from the position of Vesta/Ceres
+     * @param phase the game phase, to determine whether to use Vesta or Ceres position
+     * @return the number of fields reachable from V/C's location, excluding the field its standing on
+     * @throws IllegalStateException if V/C has not been placed yet
+     */
+    public int getNumOfReachableFields(Game.GamePhase phase) {
+        try {
+            throwErrorIfNotYetPlaced(phase);
+        } catch (InvalidMoveException e) {
+            throw new IllegalStateException(e.getMessage());
+        }
+        int targetX = (phase == Game.GamePhase.PHASE_ONE) ? vestaX : ceresX;
+        int targetY = (phase == Game.GamePhase.PHASE_ONE) ? vestaY : ceresY;
+
+        FreeFieldCounter counter = new FreeFieldCounter(board, targetX, targetY);
+
+        return counter.countReachableTokens();
+    }
 }

@@ -56,10 +56,16 @@ public class ElementaryTokenMove {
 
     /**
      * Checks for equality
-     * @param other another instance of an elementary token move
+     * @param o another instance of an elementary token move
      * @return true if this one is equal to the other
      */
-    public boolean equals(ElementaryTokenMove other) {
-        return (getDstX() == other.getDstX() && getDstY() == other.getDstY());
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ElementaryTokenMove) {
+            ElementaryTokenMove other = (ElementaryTokenMove) o;
+            return (getDstX() == other.getDstX() && getDstY() == other.getDstY());
+        }
+
+        throw new IllegalArgumentException("can only compare objects of same type");
     }
 }

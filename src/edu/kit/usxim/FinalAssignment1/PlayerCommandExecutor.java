@@ -51,6 +51,7 @@ public interface PlayerCommandExecutor {
     /**
      * Execute the provided elementary moves one after the other
      * @param moves a collection moves to execute
+     * @throws InvalidMoveException if one of the moves was invalid
      * @return status message
      */
     String move(List<ElementaryTokenMove> moves) throws InvalidMoveException;

@@ -142,4 +142,14 @@ class NatureTokenSetTest {
         assertEquals('-', b.getTokenAt(10, 10));
         assertEquals('C', b.getTokenAt(10, 8));
     }
+
+    @Test
+    public void testReachableFieldsCalc() throws InvalidPlacementException {
+        Board b = new Board();
+        NatureTokenSet nts = new NatureTokenSet(b);
+        nts.placeVC(Game.GamePhase.PHASE_ONE, 5, 5);
+
+        assertEquals(Board.BOARD_WIDTH * Board.BOARD_HEIGHT - 1,
+                nts.getNumOfReachableFields(Game.GamePhase.PHASE_ONE));
+    }
 }

@@ -1,14 +1,16 @@
 package edu.kit.usxim.FinalAssignment1;
 
-import java.util.Collection;
-
 /**
  * The board stores the current game state
  */
 public class Board {
-    private static final int BOARD_WIDTH = 15;
-    private static final int BOARD_HEIGHT = 11;
-    private static final char UNOCCUPIED_FIELD = '-';
+    /** How wide the board is */
+    public static final int BOARD_WIDTH = 15;
+    /** How high the board is */
+    public static final int BOARD_HEIGHT = 11;
+
+    /** The character to represent an unoccupied field */
+    public static final char UNOCCUPIED_FIELD = '-';
 
     private char[][] board;
 
@@ -19,6 +21,21 @@ public class Board {
         board = new char[BOARD_HEIGHT][BOARD_WIDTH];
 
         setFieldsToDefault(UNOCCUPIED_FIELD);
+    }
+
+    /**
+     * Copy constructor
+     * @param other another board to copy
+     */
+    public Board(Board other) {
+        board = new char[BOARD_HEIGHT][BOARD_WIDTH];
+
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                board[y][x] = other.getTokenAt(x, y);
+            }
+        }
+
     }
 
     private void setFieldsToDefault(char defaultValue) {
@@ -39,6 +56,17 @@ public class Board {
     public char getTokenAt(int x, int y) {
         throwErrorForInvalidCoords(x, y);
         return board[y][x];
+    }
+
+    /**
+     * Set the field state
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @param c the character to set it to
+     */
+    public void setTokenAt(int x, int y, char c) {
+        throwErrorForInvalidCoords(x, y);
+        board[y][x] = c;
     }
 
 

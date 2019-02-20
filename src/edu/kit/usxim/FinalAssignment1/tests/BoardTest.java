@@ -140,6 +140,25 @@ class BoardTest {
     }
 
     @Test
+    public void testLegalDawnPlacement() throws InvalidPlacementException {
+        Board b = new Board();
+        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 5), 0, 3, Token.Orientation.HORIZONTAL);
+        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 7), 5, -2, Token.Orientation.VERTICAL);
+
+        assertEquals("-----+---------\n" +
+                "-----+---------\n" +
+                "-----+---------\n" +
+                "++++++---------\n" +
+                "-----+---------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------", b.toString());
+    }
+
+    @Test
     public void testInvalidDawnPlacement() {
         Executable placeDawnCompletelyOutOfBoard = () -> {
             Board b = new Board();
