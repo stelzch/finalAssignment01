@@ -156,6 +156,7 @@ public class Board {
      * Check whether a field is already occupied
      * @param pos the position of the field
      * @return true if the specified field does not have a token on it
+     * @throws InvalidCoordinatesException if the provided coordinates were not on the board
      */
     public boolean checkFieldUnoccupied(Coordinates pos) throws InvalidCoordinatesException {
         return getTokenAt(pos) == UNOCCUPIED_FIELD;
@@ -212,6 +213,7 @@ public class Board {
      * Move a token from one position to another
      * @param start the starting coordinates
      * @param end the ending coordinates
+     * @throws InvalidCoordinatesException if the start or end coordinates were not on the board
      */
     public void moveToken(Coordinates start, Coordinates end) throws InvalidCoordinatesException {
         throwErrorForInvalidCoords(start);

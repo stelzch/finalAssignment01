@@ -98,8 +98,10 @@ public class NatureTokenSet {
      * @param phase the phase the game is currently in
      * @param pos the position to set V/C to
      * @throws InvalidPlacementException if the coordinates are incorrect or the target coordinates already occupied
+     * @throws InvalidCoordinatesException if the target coordinates were incorrect
      */
-    public void placeVC(Game.GamePhase phase, Coordinates pos) throws InvalidPlacementException, InvalidCoordinatesException {
+    public void placeVC(Game.GamePhase phase, Coordinates pos)
+            throws InvalidPlacementException, InvalidCoordinatesException {
         throwErrorIfAlreadyPlaced(phase);
         Token relevantToken = getTokenRelevantForPhase(phase);
         board.placeToken(relevantToken, pos, Token.Orientation.VERTICAL);
@@ -117,7 +119,8 @@ public class NatureTokenSet {
         }
     }
 
-    private void throwErrorIfDestinationOccupied(ElementaryTokenMove move) throws InvalidMoveException, InvalidCoordinatesException {
+    private void throwErrorIfDestinationOccupied(ElementaryTokenMove move)
+            throws InvalidMoveException, InvalidCoordinatesException {
         if (board.checkFieldUnoccupied(move) == false) {
             StringBuilder sb = new StringBuilder("cant move through ");
             sb.append(move);
@@ -148,6 +151,7 @@ public class NatureTokenSet {
      * @param moves a list of moves to execute
      * @return the number of steps taken (without doubles)
      * @throws InvalidMoveException if any of the moves is illegal
+     * @throws InvalidCoordinatesException if any of the coordinates specified within the moves are faulty
      */
     public int countStepsAndCheckIfLegal(Game.GamePhase phase, List<ElementaryTokenMove> moves)
             throws InvalidMoveException, InvalidCoordinatesException {
@@ -175,8 +179,10 @@ public class NatureTokenSet {
      * @param phase the phase the game is currently in (determines whether to move vesta or ceres)
      * @param moves a list of elementary moves to move along
      * @throws InvalidMoveException if one of the moves was illegal
+     * @throws InvalidCoordinatesException if any of the coordinates specified within the moves are faulty
      */
-    public void moveVC(Game.GamePhase phase, List<ElementaryTokenMove> moves) throws InvalidMoveException, InvalidCoordinatesException {
+    public void moveVC(Game.GamePhase phase, List<ElementaryTokenMove> moves)
+            throws InvalidMoveException, InvalidCoordinatesException {
         throwErrorIfNotYetPlaced(phase);
         countStepsAndCheckIfLegal(phase, moves);
 
@@ -192,7 +198,7 @@ public class NatureTokenSet {
      * @param phase the game phase, to determine whether to use Vesta or Ceres position
      * @return the number of fields reachable from V/C's location, excluding the field its standing on
      * @throws IllegalStateException if V/C has not been placed yet
-     * @throws InvalidCoordinatesException
+     * @throws InvalidCoordinatesException when an internal error happens
      */
     public int getNumOfReachableFields(Game.GamePhase phase) throws InvalidCoordinatesException, IllegalStateException {
         try {

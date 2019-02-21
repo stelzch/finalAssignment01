@@ -1,9 +1,6 @@
 package edu.kit.usxim.FinalAssignment1;
 
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidPlacementException;
+import edu.kit.usxim.FinalAssignment1.exceptions.*;
 
 import java.util.List;
 
@@ -199,7 +196,7 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String setVC(Coordinates pos) throws InvalidPlacementException, InvalidCoordinatesException {
+    public String setVC(Coordinates pos) throws GameException {
         throwErrorIfRequestStateMismatch(GameState.VC_PLACEMENT_EXPECTED);
         natureTokenSet.placeVC(phase, pos);
 
@@ -220,7 +217,8 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String place(Coordinates start, Coordinates end) throws InvalidPlacementException, InvalidCoordinatesException {
+    public String place(Coordinates start, Coordinates end)
+            throws InvalidPlacementException, InvalidCoordinatesException {
         throwErrorIfRequestStateMismatch(GameState.TOKEN_PLACEMENT_EXPECTED);
         throwErrorIfDiceNumberUnset();
 

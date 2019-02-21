@@ -93,10 +93,7 @@ public class UserInputParser {
      * Parse the provided input and execute it
      * @param line the line the user inputs
      * @return any output the routine provides
-     * @throws InvalidMoveException if the movement was invalid
-     * @throws InvalidCoordinatesException if the provided coordinates were unfit
-     * @throws InvalidDiceNumberException if the dice roll input did not match
-     * @throws InvalidPlacementException if the provided placement coordinates were weird
+     * @throws GameException if something goes wrong
      */
     public String parseInput(String line) throws GameException {
         String[] commandParts = parseCommandIntoNameAndArgs(line);

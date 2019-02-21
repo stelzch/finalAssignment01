@@ -1,9 +1,6 @@
 package edu.kit.usxim.FinalAssignment1;
 
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidPlacementException;
+import edu.kit.usxim.FinalAssignment1.exceptions.*;
 
 import java.util.List;
 
@@ -15,8 +12,9 @@ public interface PlayerCommandExecutor {
      * Get the board game state at a specific field
      * @param pos the target position
      * @return the state at the given position
+     * @throws InvalidCoordinatesException if the target field coordinates are incorrect
      */
-    String state(Coordinates pos) throws InvalidCoordinatesException, InvalidCoordinatesException;
+    String state(Coordinates pos) throws InvalidCoordinatesException;
 
     /**
      * Get the board as string representation
@@ -28,15 +26,16 @@ public interface PlayerCommandExecutor {
      * Set the vesta or ceres tokens on new positions
      * @param pos the target position
      * @return status message
-     * @throws InvalidPlacementException if the placement was illegal
      * @throws IllegalAccessException if the target token is already occupied
+     * @throws GameException if the provided coordinates were incorrect
      */
-    String setVC(Coordinates pos) throws InvalidPlacementException, IllegalAccessException, InvalidPlacementException, InvalidCoordinatesException;
+    String setVC(Coordinates pos) throws IllegalAccessException, GameException;
 
     /**
      * Signals that the dice has been rolled
      * @param symbol the symbol the dice shows
      * @return status message
+     * @throws InvalidDiceNumberException if the provided dice number was invalid
      */
     String roll(String symbol) throws InvalidDiceNumberException;
 
@@ -46,14 +45,16 @@ public interface PlayerCommandExecutor {
      * @param end the ending coordinates
      * @return status message
      * @throws InvalidPlacementException if the placement was illegal
+     * @throws InvalidCoordinatesException if the provided coordinates are not located on the board
      */
     String place(Coordinates start, Coordinates end) throws InvalidPlacementException, InvalidCoordinatesException;
 
     /**
      * Execute the provided elementary moves one after the other
      * @param moves a collection moves to execute
-     * @throws InvalidMoveException if one of the moves was invalid
      * @return status message
+     * @throws InvalidMoveException if one of the moves was invalid
+     * @throws InvalidCoordinatesException if any of the coordinates specifying the move are faulty
      */
     String move(List<ElementaryTokenMove> moves) throws InvalidMoveException, InvalidCoordinatesException;
 }

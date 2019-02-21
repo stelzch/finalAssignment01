@@ -1,7 +1,9 @@
 package edu.kit.usxim.FinalAssignment1;
 
 public class Coordinates extends Object {
+    /** The x-coordinate */
     protected int x;
+    /** The y-coordinate */
     protected int y;
 
     /**

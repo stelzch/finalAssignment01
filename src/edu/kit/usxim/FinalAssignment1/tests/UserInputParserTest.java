@@ -1,5 +1,8 @@
-package edu.kit.usxim.FinalAssignment1;
+package edu.kit.usxim.FinalAssignment1.tests;
 
+import edu.kit.usxim.FinalAssignment1.Coordinates;
+import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
+import edu.kit.usxim.FinalAssignment1.UserInputParser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 

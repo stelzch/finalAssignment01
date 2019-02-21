@@ -9,9 +9,9 @@ public class FreeFieldCounter {
     private Coordinates targetPos;
 
     /**
-     *
-     * @param b
+     * @param b the board of which to count the free fields
      * @param pos the target coordinates
+     * @throws InvalidCoordinatesException if the target coordinates provided were invalid
      */
     public FreeFieldCounter(Board b, Coordinates pos) throws InvalidCoordinatesException {
         board = new Board(b);
