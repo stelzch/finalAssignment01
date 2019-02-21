@@ -1,6 +1,6 @@
 package edu.kit.usxim.FinalAssignment1;
 
-public class ElementaryTokenMove {
+public class ElementaryTokenMove extends Coordinates {
     private int dstX;
     private int dstY;
 
@@ -10,6 +10,7 @@ public class ElementaryTokenMove {
      * @param dstY the y-coordinate to move to
      */
     public ElementaryTokenMove(int dstX, int dstY) {
+        super(dstX, dstY);
         this.dstX = dstX;
         this.dstY = dstY;
     }

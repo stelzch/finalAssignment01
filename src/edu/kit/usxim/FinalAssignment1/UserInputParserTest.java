@@ -3,14 +3,16 @@ package edu.kit.usxim.FinalAssignment1;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserInputParserTest {
 
     @Test
-    public void testSimplePrint() {
-        Game g = new Game();
-        UserInputParser parser = new UserInputParser(g);
+    public void testSimplePrint() throws Exception {
+        UserInputParser parser = new UserInputParser();
 
         String output = parser.parseInput("print");
         assertTrue(output.startsWith("-"));
@@ -18,8 +20,7 @@ class UserInputParserTest {
 
     @Test
     public void testCommandParsing() {
-        Game g = new Game();
-        UserInputParser parser = new UserInputParser(g);
+        UserInputParser parser = new UserInputParser();
 
         String[] result = parser.parseCommandIntoNameAndArgs("print herearetheargs");
         assertEquals(2, result.length);
@@ -29,8 +30,7 @@ class UserInputParserTest {
 
     @Test
     public void testCommandParsingWithoutArgs() {
-        Game g = new Game();
-        UserInputParser parser = new UserInputParser(g);
+        UserInputParser parser = new UserInputParser();
 
         String[] result = parser.parseCommandIntoNameAndArgs("onlyacommand");
         assertEquals(2, result.length);
@@ -40,8 +40,7 @@ class UserInputParserTest {
 
     @Test
     public void testCommandParsingWithManySpaceArgs() {
-        Game g = new Game();
-        UserInputParser parser = new UserInputParser(g);
+        UserInputParser parser = new UserInputParser();
 
         String command = "commandName arg1 arg2";
         try {
@@ -56,8 +55,7 @@ class UserInputParserTest {
 
     @Test
     public void testEmptyCommandParsing() {
-        Game g = new Game();
-        UserInputParser parser = new UserInputParser(g);
+        UserInputParser parser = new UserInputParser();
 
         String[] result = parser.parseCommandIntoNameAndArgs("");
 
@@ -68,8 +66,7 @@ class UserInputParserTest {
 
     @Test
     public void testEmptyCommandButArgsparsing() {
-        Game g = new Game();
-        UserInputParser parser = new UserInputParser(g);
+        UserInputParser parser = new UserInputParser();
 
         try {
             String[] result = parser.parseCommandIntoNameAndArgs(" argsonly");
@@ -83,36 +80,31 @@ class UserInputParserTest {
 
     @Test
     public void testCoordinateArg() {
-        Game g = new Game();
-        UserInputParser parser = new UserInputParser(g);
+        UserInputParser parser = new UserInputParser();
 
-        int[] result = parser.parseCoordinates("5;33");
-        assertEquals(2, result.length);
-        assertEquals(5, result[0]);
-        assertEquals(33, result[1]);
+        ElementaryTokenMove result = parser.parseCoordinates("5;33");
+        assertEquals(5, result.getDstY());
+        assertEquals(33, result.getDstX());
     }
 
     @Test
     public void testIllegalCoordinateArg() {
         Executable parseMalformedCoordinateArg = () -> {
-            Game g = new Game();
-            UserInputParser parser = new UserInputParser(g);
+            UserInputParser parser = new UserInputParser();
 
-            int[] result = parser.parseCoordinates("5;3a3");
+            ElementaryTokenMove result = parser.parseCoordinates("5;3a3");
         };
 
         Executable parseHexCoordinateArg = () -> {
-            Game g = new Game();
-            UserInputParser parser = new UserInputParser(g);
+            UserInputParser parser = new UserInputParser();
 
-            int[] result = parser.parseCoordinates("0x03;0x22");
+            ElementaryTokenMove result = parser.parseCoordinates("0x03;0x22");
         };
 
         Executable parseNegativeCoordinateArg = () -> {
-            Game g = new Game();
-            UserInputParser parser = new UserInputParser(g);
+            UserInputParser parser = new UserInputParser();
 
-            int[] result = parser.parseCoordinates("5;-5");
+            ElementaryTokenMove result = parser.parseCoordinates("5;-5");
         };
 
         assertThrows(IllegalArgumentException.class, parseMalformedCoordinateArg);
@@ -120,4 +112,35 @@ class UserInputParserTest {
         assertThrows(IllegalArgumentException.class, parseNegativeCoordinateArg);
     }
 
+    @Test
+    public void testParseCoordinateList() {
+        UserInputParser parser = new UserInputParser();
+
+        List<ElementaryTokenMove> coordinates = parser.parseCoordinateList("5;1:23;1:4;2");
+
+        List<ElementaryTokenMove> expected = new ArrayList<>();
+        expected.add(new ElementaryTokenMove(1, 5));
+        expected.add(new ElementaryTokenMove(1, 23));
+        expected.add(new ElementaryTokenMove(2, 4));
+
+        assertIterableEquals(expected, coordinates);
+    }
+
+    @Test
+    public void testInvalidCoordinateList() {
+        Executable errorInCoordinate = () -> {
+            UserInputParser parser = new UserInputParser();
+
+            List<ElementaryTokenMove> coordinates = parser.parseCoordinateList("5;1:23;1:4;a2");
+        };
+
+        Executable endingWithDoublecolon = () -> {
+            UserInputParser parser = new UserInputParser();
+
+            List<ElementaryTokenMove> coordinates = parser.parseCoordinateList("5;1:23;1:4;2:");
+        };
+
+        assertThrows(IllegalArgumentException.class, errorInCoordinate);
+        assertThrows(IllegalArgumentException.class, endingWithDoublecolon);
+    }
 }
