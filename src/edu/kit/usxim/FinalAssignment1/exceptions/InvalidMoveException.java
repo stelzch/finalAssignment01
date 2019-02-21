@@ -1,4 +1,6 @@
-package edu.kit.usxim.FinalAssignment1;
+package edu.kit.usxim.FinalAssignment1.exceptions;
+
+import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
 
 public class InvalidMoveException extends Exception {
     /**

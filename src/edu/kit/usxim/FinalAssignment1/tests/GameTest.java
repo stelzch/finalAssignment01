@@ -1,9 +1,7 @@
 package edu.kit.usxim.FinalAssignment1.tests;
 
-import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
-import edu.kit.usxim.FinalAssignment1.Game;
-import edu.kit.usxim.FinalAssignment1.InvalidMoveException;
-import edu.kit.usxim.FinalAssignment1.InvalidPlacementException;
+import edu.kit.usxim.FinalAssignment1.*;
+import edu.kit.usxim.FinalAssignment1.exceptions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.omg.CORBA.DynAnyPackage.Invalid;
@@ -25,18 +23,18 @@ class GameTest {
     }
 
     @Test
-    public void testInitialGameState() {
+    public void testInitialGameState() throws InvalidCoordinatesException {
         Game g = new Game();
-        assertEquals('-', g.state(0, 0).charAt(0));
+        assertEquals('-', g.state(new Coordinates(0, 0)).charAt(0));
     }
 
     @Test
-    public void testStateTransition() throws InvalidPlacementException, IllegalAccessException {
+    public void testStateTransition() throws InvalidPlacementException, IllegalAccessException, InvalidCoordinatesException {
         Game g = new Game();
 
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
 
-        g.setVC(0, 0);
+        g.setVC(new Coordinates(0, 0));
 
         for (int i=1; i <= 6; i++) {
             System.out.println("Round " + i);
@@ -53,20 +51,20 @@ class GameTest {
     }
 
     @Test
-    public void testBasicVestaPlacement() throws InvalidPlacementException, IllegalAccessException {
+    public void testBasicVestaPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidCoordinatesException {
         Game g = new Game();
-        g.setVC(3, 3);
+        g.setVC(new Coordinates(3, 3));
 
         assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
     }
 
     @Test
-    public void testBasicPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidPlacementException {
+    public void testBasicPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidPlacementException, InvalidCoordinatesException, InvalidDiceNumberException {
         Game g = new Game();
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
-        g.setVC(2, 3);
+        g.setVC(new Coordinates( 3, 2));
         g.roll("3");
-        g.place(0, 0, 2, 0);
+        g.place(new Coordinates(0, 0), new Coordinates(2, 0));
 
         assertGameBoardState(
                 "+++------------\n" +
@@ -81,17 +79,17 @@ class GameTest {
                 "---------------\n" +
                 "---------------", g);
 
-        assertEquals("V", g.state(2, 3));
-        assertEquals("+", g.state(0, 2));
-    }
+        assertEquals("V", g.state(new Coordinates( 3, 2)));
+        assertEquals("+", g.state(new Coordinates( 2, 0)));
+        }
 
     @Test
-    public void testDawnPlacement() throws InvalidPlacementException, IllegalAccessException {
+    public void testDawnPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidCoordinatesException, InvalidDiceNumberException {
         Game g = new Game();
-        g.setVC(5, 2);
+        g.setVC(new Coordinates( 2, 5));
         g.roll("DAWN");
 
-        g.place(-5, 0, 1, 0);
+        g.place(new Coordinates(-5, 0), new Coordinates(1, 0));
 
         assertGameBoardState(
                 "++-------------\n" +
@@ -108,9 +106,9 @@ class GameTest {
 
         /* Try another game */
         g = new Game();
-        g.setVC(9, 14);
+        g.setVC(new Coordinates(   14,   9));
         g.roll("DAWN");
-        g.place(19, 10, 13, 10);
+        g.place(new Coordinates(19, 10), new Coordinates(13, 10));
 
         assertGameBoardState(
                 "---------------\n" +
@@ -132,17 +130,17 @@ class GameTest {
         Executable placeTokenLongerThanRoll = () -> {
             Game g = new Game();
 
-            g.setVC(5, 5);
+            g.setVC(new Coordinates(5, 5));
             g.roll("3");
-            g.place(0, 0, 6, 0);
+            g.place(new Coordinates(0, 0), new Coordinates(6, 0));
         };
 
         Executable placeTokenFittingRoll = () -> {
             Game g = new Game();
 
-            g.setVC(5, 5);
+            g.setVC(new Coordinates(5, 5));
             g.roll("3");
-            g.place(0, 0, 2, 0);
+            g.place(new Coordinates(0, 0), new Coordinates(2, 0));
         };
 
         assertThrows(IllegalArgumentException.class, placeTokenLongerThanRoll);
@@ -153,9 +151,9 @@ class GameTest {
     public void testIllegalVestaMovement() {
         Executable moveVestaTooLong = () -> {
             Game g = new Game();
-            g.setVC(4, 4);
+            g.setVC(new Coordinates(4, 4));
             g.roll("DAWN");
-            g.place(0, 0, 6, 0);
+            g.place(new Coordinates(0, 0), new Coordinates(6, 0));
 
             List<ElementaryTokenMove> moves = new ArrayList<ElementaryTokenMove>();
             moves.add(new ElementaryTokenMove(5, 4));
@@ -174,7 +172,7 @@ class GameTest {
 
         Executable moveVestaThroughMC = () -> {
             Game g = new Game();
-            g.setVC(5, 5);
+            g.setVC(new Coordinates(5, 5));
             g.roll("DAWN");
         };
 
@@ -182,7 +180,7 @@ class GameTest {
     }
 
     @Test
-    public void testSimpleMovement() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException {
+    public void testSimpleMovement() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException, InvalidCoordinatesException, InvalidDiceNumberException {
         Game g = new Game();
         List<ElementaryTokenMove> moveOneStepForward = new ArrayList<>();
         List<ElementaryTokenMove> moveOneStepBack = new ArrayList<>();
@@ -190,23 +188,23 @@ class GameTest {
         moveOneStepForward.add(new ElementaryTokenMove(1, 0));
         moveOneStepBack.add(new ElementaryTokenMove(0, 0));
 
-        g.setVC(0, 0);
+        g.setVC(new Coordinates(0, 0));
         g.roll("2");
-        g.place(5, 0, 5, 1);
+        g.place(new Coordinates(5, 0), new Coordinates(5, 1));
         g.move(moveOneStepForward);
 
-        assertEquals("V", g.state(0, 1));
+        assertEquals("V", g.state(new Coordinates( 1, 0)));
 
         g.roll("2");
-        g.place(6, 0, 6, 2);
+        g.place(new Coordinates(6, 0), new Coordinates(6, 2));
         g.move(moveOneStepBack);
 
         System.out.println("Gamestate: " + g.print());
-        assertEquals("V", g.state(0, 0));
+        assertEquals("V", g.state(new Coordinates(0, 0)));
     }
 
     @Test
-    public void testMultiplePhases() throws InvalidPlacementException, InvalidMoveException, IllegalAccessException {
+    public void testMultiplePhases() throws InvalidPlacementException, InvalidMoveException, IllegalAccessException, InvalidCoordinatesException, InvalidDiceNumberException {
         Game g = new Game();
         List<ElementaryTokenMove> moveOneStepForward = new ArrayList<>();
         List<ElementaryTokenMove> moveOneStepBack = new ArrayList<>();
@@ -218,10 +216,10 @@ class GameTest {
 
 
         // Round 1
-        g.setVC(0, 0);
+        g.setVC(new Coordinates(0, 0));
         for (int round = 2; round <= 7; round++) {
             g.roll((round == 7) ? "DAWN" : String.valueOf(round));
-            g.place(0, round, round - 1, round);
+            g.place(new Coordinates(0, round), new Coordinates(round - 1, round));
 
             g.move((round % 2 == 0) ? moveOneStepForward : moveOneStepBack);
         }
@@ -239,10 +237,10 @@ class GameTest {
                         "---------------", g);
 
         // Round 2
-        g.setVC(0, 1);
+        g.setVC(new Coordinates( 1, 0));
         for (int round = 2; round <= 7; round++) {
             g.roll((round == 7) ? "DAWN" : String.valueOf(round));
-            g.place(14, round, 14 - (round - 1), round);
+            g.place(new Coordinates(14, round), new Coordinates(14 - (round - 1), round));
 
             g.move((round % 2 == 0) ? moveToThirdPos : moveOneStepForward);
         }
@@ -266,19 +264,19 @@ class GameTest {
     public void testVestaMovementMinimum() throws InvalidPlacementException, IllegalAccessException {
         Executable moveWithEmptyList = () -> {
             Game g = new Game();
-            g.setVC(0, 0);
+            g.setVC(new Coordinates(0, 0));
 
             g.roll("DAWN");
-            g.place(1, 0, 1+6, 0);
+            g.place(new Coordinates(1, 0), new Coordinates(1+6, 0));
             g.move(new ArrayList<ElementaryTokenMove>());
         };
 
         Executable moveWithSameCoordsList = () -> {
             Game g = new Game();
-            g.setVC(0, 0);
+            g.setVC(new Coordinates(0, 0));
 
             g.roll("DAWN");
-            g.place(1, 0, 1+6, 0);
+            g.place(new Coordinates(1, 0), new Coordinates(1+6, 0));
 
             List<ElementaryTokenMove> moves  = new ArrayList<>();
             moves.add(new ElementaryTokenMove(0, 0));
@@ -296,16 +294,16 @@ class GameTest {
         return list;
     }
     @Test
-    public void testImmovableVesta() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException {
+    public void testImmovableVesta() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException, InvalidDiceNumberException, InvalidCoordinatesException {
         Game g = new Game();
-        g.setVC(1,0);
+        g.setVC(new Coordinates(0, 1));
         g.roll("2");
-        g.place(1, 0, 2, 0);
+        g.place(new Coordinates(1, 0), new Coordinates(2, 0));
         g.move(getListForSingleMove(new ElementaryTokenMove(0, 0)));
-        assertEquals("V", g.state(0, 0));
+        assertEquals("V", g.state(new Coordinates(0, 0)));
 
         g.roll("2");
-        g.place(0, 1, 0, 3);
+        g.place(new Coordinates(0, 1), new Coordinates(0, 3));
 
         try {
             g.roll("2");

@@ -1,29 +1,28 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
+
 public class FreeFieldCounter {
     private static final char TOKEN_VISITED = '*';
     private Board board;
     private int fieldsVisited = 0;
-    private int targetX;
-    private int targetY;
+    private Coordinates targetPos;
 
     /**
      *
      * @param b
-     * @param x
-     * @param y
+     * @param pos the target coordinates
      */
-    public FreeFieldCounter(Board b, int x, int y) {
+    public FreeFieldCounter(Board b, Coordinates pos) throws InvalidCoordinatesException {
         board = new Board(b);
 
-        targetX = x;
-        targetY = y;
+        targetPos = pos;
 
-        board.setTokenAt(x, y, TOKEN_VISITED);
-        floodFillNeighbours(x, y);
+        board.setTokenAt(targetPos, TOKEN_VISITED);
+        floodFillNeighbours(targetPos.getX(), targetPos.getY());
     }
 
-    private void floodFillNeighbours(int x, int y) {
+    private void floodFillNeighbours(int x, int y) throws InvalidCoordinatesException {
         if (x > 0)
             floodFill(x - 1, y); // left
         if (x < Board.BOARD_WIDTH - 1)
@@ -34,10 +33,10 @@ public class FreeFieldCounter {
             floodFill(x, y + 1); // above
     }
 
-    private void floodFill(int x, int y) {
-        if (board.getTokenAt(x, y) == Board.UNOCCUPIED_FIELD) {
+    private void floodFill(int x, int y) throws InvalidCoordinatesException {
+        if (board.getTokenAt(new Coordinates(x, y)) == Board.UNOCCUPIED_FIELD) {
             fieldsVisited += 1;
-            board.setTokenAt(x, y, TOKEN_VISITED);
+            board.setTokenAt(new Coordinates(x, y), TOKEN_VISITED);
 
             floodFillNeighbours(x, y);
         }

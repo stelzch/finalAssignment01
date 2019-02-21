@@ -1,5 +1,8 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidPlacementException;
+
 /**
  * The board stores the current game state
  */
@@ -30,9 +33,16 @@ public class Board {
     public Board(Board other) {
         board = new char[BOARD_HEIGHT][BOARD_WIDTH];
 
+        Coordinates lookupCoordinates = new Coordinates(0, 0);
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                board[y][x] = other.getTokenAt(x, y);
+                lookupCoordinates.setX(x);
+                lookupCoordinates.setY(y);
+                try {
+                    board[y][x] = other.getTokenAt(lookupCoordinates);
+                } catch (InvalidCoordinatesException e){
+                    throw new RuntimeException("Board dimension coordinates are invalid");
+                }
             }
         }
 
@@ -49,55 +59,51 @@ public class Board {
     /**
      * Get the field state
      *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
+     * @param target the target coordinates
      * @return the character representation at the given coordinates
      */
-    public char getTokenAt(int x, int y) {
-        throwErrorForInvalidCoords(x, y);
-        return board[y][x];
+    public char getTokenAt(Coordinates target) throws InvalidCoordinatesException {
+        throwErrorForInvalidCoords(target);
+        return board[target.getY()][target.getX()];
     }
 
     /**
      * Set the field state
-     * @param x the x-coordinate
-     * @param y the y-coordinate
+     * @param target the target coordinates
      * @param c the character to set it to
      */
-    public void setTokenAt(int x, int y, char c) {
-        throwErrorForInvalidCoords(x, y);
-        board[y][x] = c;
+    public void setTokenAt(Coordinates target, char c) throws InvalidCoordinatesException {
+        throwErrorForInvalidCoords(target);
+        board[target.getY()][target.getX()] = c;
     }
 
 
-    private void throwErrorForInvalidCoords(int x, int y) {
+    private void throwErrorForInvalidCoords(Coordinates coords) throws InvalidCoordinatesException {
+        int x = coords.getX();
+        int y = coords.getY();
+
         if (x < 0 || y < 0)
-            throw new IllegalArgumentException("coordinates must be positive integers!");
+            throw new InvalidCoordinatesException("coordinates must be positive integers!");
 
         if (x > (BOARD_WIDTH - 1))
-            throw new IllegalArgumentException("x coordinate must be smaller than " + BOARD_WIDTH);
+            throw new InvalidCoordinatesException("x coordinate must be smaller than " + BOARD_WIDTH);
 
         if (y > (BOARD_HEIGHT - 1))
-            throw new IllegalArgumentException("y coordinate must be bigger than " + BOARD_HEIGHT);
+            throw new InvalidCoordinatesException("y coordinate must be bigger than " + BOARD_HEIGHT);
     }
 
-    private void throwErrorForInvalidPlacement(int x, int y, int endX, int endY) throws InvalidPlacementException {
-        try {
-            throwErrorForInvalidCoords(x, y);
-            throwErrorForInvalidCoords(endX, endY);
-        } catch (IllegalArgumentException e) {
-            // The coordinates are wrong, throw illegal placement exc
-            throw new InvalidPlacementException("the coordinates are out of bounds");
-        }
+    private void throwErrorForInvalidPlacement(Coordinates start, Coordinates end) throws InvalidPlacementException, InvalidCoordinatesException {
+        throwErrorForInvalidCoords(start);
+        throwErrorForInvalidCoords(end);
 
-        if ((x > endX) || (y > endY)) {
+        if ((start.getX() > end.getX()) || (start.getY() > end.getY())) {
             throw new InvalidPlacementException("the starting coordinates must be smaller");
         }
     }
 
-    private void throwErrorForInvalidDawnPlacement(int x, int y, int endX, int endY) throws InvalidPlacementException {
+    private void throwErrorForInvalidDawnPlacement(Coordinates start, Coordinates end) throws InvalidPlacementException {
         // Either the start or the end must be on the field
-        if (isFieldOnBoard(x, y) || isFieldOnBoard(endX, endY)) {
+        if (isFieldOnBoard(start) || isFieldOnBoard(end)) {
             return;
         }
 
@@ -108,31 +114,33 @@ public class Board {
      * Place a token at a given position
      *
      * @param token       the token type
-     * @param x           the x-coord
-     * @param y           the y-coord
+     * @param pos the position where to place the coordinates
      * @param orientation the token orientation
      * @throws InvalidPlacementException if the placement is incorrect
      */
-    public void placeToken(Token token, int x, int y, Token.Orientation orientation) throws InvalidPlacementException {
-        int endX = x;
-        int endY = y;
+    public void placeToken(Token token, Coordinates pos, Token.Orientation orientation) throws InvalidPlacementException, InvalidCoordinatesException {
+        int endX = pos.getX();
+        int endY = pos.getY();
 
         if (orientation == Token.Orientation.HORIZONTAL)
-            endX = x + token.getSize() - 1;
+            endX = pos.getX() + token.getSize() - 1;
 
         if (orientation == Token.Orientation.VERTICAL)
-            endY = y + token.getSize() - 1;
+            endY = pos.getY() + token.getSize() - 1;
 
+
+        Coordinates endingCoordinates = new Coordinates(endX, endY);
         // Check if the coordinates are out of bounds, but for the DAWN token, special rules apply
         if (token.getSize() == Token.DAWN_SIZE) {
-            throwErrorForInvalidDawnPlacement(x, y, endX, endY);
+            throwErrorForInvalidDawnPlacement(pos, endingCoordinates);
         } else {
-            throwErrorForInvalidPlacement(x, y, endX, endY);
+            throwErrorForInvalidPlacement(pos, endingCoordinates);
         }
 
 
-        if (checkFieldsUnoccupied(x, y, endX, endY)) {
-            setLineOfFieldsToChar(token.toString().charAt(0), x, y, endX, endY);
+        if (checkFieldsUnoccupied(pos, endingCoordinates)) {
+            setLineOfFieldsToChar(token.toString().charAt(0),
+                    pos.getX(), pos.getY(), endingCoordinates.getX(), endingCoordinates.getY());
         } else {
             throw new InvalidPlacementException("some of the fields this token would inhabit are already occupied");
         }
@@ -140,32 +148,32 @@ public class Board {
 
     /**
      * Check whether a field is already occupied
-     * @param x the x-coordinate of the field to lookup
-     * @param y the y-coordinate of the field to lookup
+     * @param pos the position of the field
      * @return true if the specified field does not have a token on it
      */
-    public boolean checkFieldUnoccupied(int x, int y) {
-        return board[y][x] == UNOCCUPIED_FIELD;
+    public boolean checkFieldUnoccupied(Coordinates pos) throws InvalidCoordinatesException {
+        return getTokenAt(pos) == UNOCCUPIED_FIELD;
     }
 
     /**
      * Checks whether the given field is within the board bounds
-     * @param x the x-coordinate
-     * @param y the y-coordinate
+     * @param fieldCoord the position of the field
      * @return true if the (x,y) field is inside the boards bounds
      */
-    public boolean isFieldOnBoard(int x, int y) {
-        return (x >= 0 && x < BOARD_WIDTH)
-                && (y >= 0 && y < BOARD_HEIGHT);
+    public boolean isFieldOnBoard(Coordinates fieldCoord) {
+        return (fieldCoord.getX() >= 0 && fieldCoord.getX() < BOARD_WIDTH)
+                && (fieldCoord.getY() >= 0 && fieldCoord.getY() < BOARD_HEIGHT);
     }
 
-    private boolean checkFieldsUnoccupied(int startX, int startY, int endX, int endY) {
-        assert (startX <= endX);
-        assert (startY <= endY);
+    private boolean checkFieldsUnoccupied(Coordinates start, Coordinates end) throws InvalidCoordinatesException {
+        assert (start.getX() <= end.getX());
+        assert (start.getY() <= end.getY());
 
-        for (int x = startX; x <= endX; x++) {
-            for (int y = startY; y <= endY; y++) {
-                if (isFieldOnBoard(x, y) && !checkFieldUnoccupied(x, y))
+        for (int x = start.getX(); x <= end.getX(); x++) {
+            for (int y = start.getY(); y <= end.getY(); y++) {
+                Coordinates currentCoordinates = new Coordinates(x, y);
+                if (isFieldOnBoard(currentCoordinates)
+                        && !checkFieldUnoccupied(currentCoordinates))
                     return false;
             }
         }
@@ -185,7 +193,7 @@ public class Board {
     private void setLineOfFieldsToChar(char c, int startX, int startY, int endX, int endY) {
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                if (isFieldOnBoard(x, y))
+                if (isFieldOnBoard(new Coordinates(x, y)))
                     board[y][x] = c;
             }
         }
@@ -193,17 +201,15 @@ public class Board {
 
     /**
      * Move a token from one position to another
-     * @param x1 the starting x coordinate
-     * @param y1 the starting y coordinate
-     * @param x2 the ending x coordinate
-     * @param y2 the ending y coordinate
+     * @param start the starting coordinates
+     * @param end the ending coordinates
      */
-    public void moveToken(int x1, int y1, int x2, int y2) {
-        throwErrorForInvalidCoords(x1, y1);
-        throwErrorForInvalidCoords(x2, y2);
+    public void moveToken(Coordinates start, Coordinates end) throws InvalidCoordinatesException {
+        throwErrorForInvalidCoords(start);
+        throwErrorForInvalidCoords(end);
 
-        board[y2][x2] = board[y1][x1];
-        board[y1][x1] = UNOCCUPIED_FIELD;
+        board[end.getY()][end.getX()] = board[start.getY()][start.getX()];
+        board[start.getY()][start.getX()] = UNOCCUPIED_FIELD;
     }
     /**
      * Get string-representation of board
@@ -211,9 +217,16 @@ public class Board {
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        Coordinates lookupCoords = new Coordinates(0, 0);
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
-                sb.append(getTokenAt(x, y));
+                lookupCoords.setX(x);
+                lookupCoords.setY(y);
+                try {
+                    sb.append(getTokenAt(lookupCoords));
+                } catch (InvalidCoordinatesException e) {
+                    throw new RuntimeException("loop boundaries defined wrong");
+                }
             }
             sb.append("\n");
         }

@@ -1,5 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
+
 import java.util.Iterator;
 import java.util.List;
 

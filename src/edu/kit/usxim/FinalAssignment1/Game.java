@@ -1,5 +1,10 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidPlacementException;
+
 import java.util.List;
 
 /**
@@ -106,7 +111,14 @@ public class Game implements PlayerCommandExecutor {
             return;
         }
 
-        if (state == GameState.VC_MOVEMENT_EXPECTED && !vcCanStillMove()) {
+        boolean vcStillMovable;
+        try {
+            vcStillMovable = vcCanStillMove();
+        } catch (InvalidCoordinatesException e) {
+            // This happens when VC is not yet placed. Just default it to true
+            vcStillMovable = true;
+        }
+        if (state == GameState.VC_MOVEMENT_EXPECTED && !vcStillMovable) {
             // Vesta or Ceres cant move, so skip this step
             moveToNextState();
             return;
@@ -118,7 +130,7 @@ public class Game implements PlayerCommandExecutor {
         }
     }
 
-    private boolean vcCanStillMove() {
+    private boolean vcCanStillMove() throws InvalidCoordinatesException {
         return natureTokenSet.getNumOfReachableFields(phase) > 0;
     }
 
@@ -127,13 +139,13 @@ public class Game implements PlayerCommandExecutor {
      * @param symbol a string representing the dice number (2-6 or DAWN)
      * @return an integer between 2 and 7
      */
-    private int parseDiceSymbol(String symbol) {
+    private int parseDiceSymbol(String symbol) throws InvalidDiceNumberException {
         if (symbol.matches("[2-7]")) {
             return Integer.parseInt(symbol);
         } else if (symbol.equals("DAWN")) {
             return 7;
         } else {
-            throw new IllegalArgumentException("the dice symbol is invalid");
+            throw new InvalidDiceNumberException("the dice symbol is invalid");
         }
     }
 
@@ -175,10 +187,9 @@ public class Game implements PlayerCommandExecutor {
             throw new IllegalStateException("the last dice roll was invalid");
         }
     }
-
     @Override
-    public String state(int m, int n) {
-        char field = board.getTokenAt(n, m);
+    public String state(Coordinates pos) throws InvalidCoordinatesException {
+        char field = board.getTokenAt(pos);
         return String.valueOf(field);
     }
 
@@ -188,9 +199,9 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String setVC(int m, int n) throws InvalidPlacementException, IllegalAccessException {
+    public String setVC(Coordinates pos) throws InvalidPlacementException, InvalidCoordinatesException {
         throwErrorIfRequestStateMismatch(GameState.VC_PLACEMENT_EXPECTED);
-        natureTokenSet.placeVC(phase, n, m);
+        natureTokenSet.placeVC(phase, pos);
 
         moveToNextState();
 
@@ -198,7 +209,7 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String roll(String symbol) {
+    public String roll(String symbol) throws InvalidDiceNumberException {
         throwErrorIfRequestStateMismatch(GameState.DICE_ROLL_EXPECTED);
 
         lastDiceRoll = parseDiceSymbol(symbol);
@@ -209,19 +220,19 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String place(int x1, int y1, int x2, int y2) throws InvalidPlacementException {
+    public String place(Coordinates start, Coordinates end) throws InvalidPlacementException, InvalidCoordinatesException {
         throwErrorIfRequestStateMismatch(GameState.TOKEN_PLACEMENT_EXPECTED);
         throwErrorIfDiceNumberUnset();
 
-        Token.Orientation or = Utils.getLineOrientation(x1, y1, x2, y2);
-        int requiredTokenSize = Utils.getStraightLineLength(x1, y1, x2, y2);
+        Token.Orientation or = Utils.getLineOrientation(start, end);
+        int requiredTokenSize = Utils.getStraightLineLength(start, end);
 
         Token t = getTokenForDiceNumber(requiredTokenSize);
 
-        int x = Math.min(x1, x2);
-        int y = Math.min(y1, y2);
+        int x = Math.min(start.getX(), end.getX());
+        int y = Math.min(start.getY(), end.getY());
 
-        board.placeToken(t, x, y, or);
+        board.placeToken(t, new Coordinates(x, y), or);
         getTokenSetForPhase().removeToken(t);
 
         moveToNextState();
@@ -230,7 +241,7 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String move(List<ElementaryTokenMove> moves) throws InvalidMoveException {
+    public String move(List<ElementaryTokenMove> moves) throws InvalidMoveException, InvalidCoordinatesException {
         throwErrorIfRequestStateMismatch(GameState.VC_MOVEMENT_EXPECTED);
         throwErrorIfDiceNumberUnset();
 

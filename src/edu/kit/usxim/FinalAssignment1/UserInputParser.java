@@ -1,5 +1,9 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +29,7 @@ public class UserInputParser {
      * @return an elementary token move
      * @throws IllegalArgumentException if the provided input is malformed
      */
-    public ElementaryTokenMove parseCoordinates(String input) {
+    public Coordinates parseCoordinates(String input) {
         if (!input.matches("[0-9]+;[0-9]+"))
             throwErrorForInvalidCoordinate(input);
 
@@ -36,8 +40,8 @@ public class UserInputParser {
         try {
             int coordY = Integer.parseInt(parts[0]);
             int coordX = Integer.parseInt(parts[1]);
-            ElementaryTokenMove move = new ElementaryTokenMove(coordX, coordY);
-            return move;
+            Coordinates coords = new Coordinates(coordX, coordY);
+            return coords;
         } catch (NumberFormatException e) {
             throwErrorForInvalidCoordinate(input);
         }
@@ -53,7 +57,7 @@ public class UserInputParser {
         List<ElementaryTokenMove> result = new ArrayList<>();
 
         for (String coordinate : coordinateList)
-            result.add(parseCoordinates(coordinate));
+            result.add(new ElementaryTokenMove(parseCoordinates(coordinate)));
 
         return result;
     }
@@ -87,7 +91,7 @@ public class UserInputParser {
      * @param line the line the user inputs
      * @return any output the routine provides
      */
-    public String parseInput(String line) throws InvalidMoveException {
+    public String parseInput(String line) throws InvalidMoveException, InvalidCoordinatesException, InvalidDiceNumberException {
         String[] commandParts = parseCommandIntoNameAndArgs(line);
         String commandName = commandParts[0];
         String commandArgs = commandParts[1];
@@ -96,8 +100,8 @@ public class UserInputParser {
             case "print":
                 return executor.print();
             case "state":
-                ElementaryTokenMove coords = parseCoordinates(commandArgs);
-                return executor.state(coords.getDstY(), coords.getDstX());
+                Coordinates coords = parseCoordinates(commandArgs);
+                return executor.state(coords);
             case "roll":
                 return executor.roll(commandArgs);
             case "place":

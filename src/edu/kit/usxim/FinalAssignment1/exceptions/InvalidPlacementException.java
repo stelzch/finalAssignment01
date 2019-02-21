@@ -1,4 +1,4 @@
-package edu.kit.usxim.FinalAssignment1;
+package edu.kit.usxim.FinalAssignment1.exceptions;
 
 public class InvalidPlacementException extends Exception {
     /**

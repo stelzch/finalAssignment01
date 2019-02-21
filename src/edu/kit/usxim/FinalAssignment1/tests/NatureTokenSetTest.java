@@ -3,6 +3,7 @@ package edu.kit.usxim.FinalAssignment1.tests;
 import edu.kit.usxim.FinalAssignment1.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import edu.kit.usxim.FinalAssignment1.exceptions.*;
 
 
 import java.util.ArrayList;
@@ -13,26 +14,26 @@ import static org.junit.jupiter.api.Assertions.*;
 class NatureTokenSetTest {
 
     @Test
-    public void basicPlacementRoutines() throws InvalidPlacementException{
+    public void basicPlacementRoutines() throws InvalidPlacementException, InvalidCoordinatesException {
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
 
-        nts.placeVC(Game.GamePhase.PHASE_ONE, 2, 3);
-        nts.placeVC(Game.GamePhase.PHASE_TWO, 2, 4);
+        nts.placeVC(Game.GamePhase.PHASE_ONE, new Coordinates(2, 3));
+        nts.placeVC(Game.GamePhase.PHASE_TWO, new Coordinates(2, 4));
 
-        assertEquals('V', b.getTokenAt(2, 3));
-        assertEquals('C', b.getTokenAt(2, 4));
+        assertEquals('V', b.getTokenAt(new Coordinates(2, 3)));
+        assertEquals('C', b.getTokenAt(new Coordinates(2, 4)));
     }
 
 
     @Test
-    public void testMultipleVestaPlacement() throws InvalidPlacementException {
+    public void testMultipleVestaPlacement() throws InvalidPlacementException, InvalidCoordinatesException {
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
 
-        nts.placeVC(Game.GamePhase.PHASE_ONE, 0, 0);
+        nts.placeVC(Game.GamePhase.PHASE_ONE, new Coordinates(0, 0));
         try {
-            nts.placeVC(Game.GamePhase.PHASE_ONE, 0, 3);
+            nts.placeVC(Game.GamePhase.PHASE_ONE, new Coordinates(0, 3));
         } catch (InvalidPlacementException e) {
             assertEquals("vesta has already been placed", e.getMessage());
             return;
@@ -42,18 +43,18 @@ class NatureTokenSetTest {
     }
 
     @Test
-    public void testBasicElementaryMoves() throws InvalidPlacementException, InvalidMoveException {
+    public void testBasicElementaryMoves() throws InvalidPlacementException, InvalidMoveException, InvalidCoordinatesException {
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
-        nts.placeVC(Game.GamePhase.PHASE_TWO, 5, 4);
-        assertEquals('C', b.getTokenAt(5, 4));
+        nts.placeVC(Game.GamePhase.PHASE_TWO, new Coordinates(5, 4));
+        assertEquals('C', b.getTokenAt(new Coordinates(5, 4)));
 
         List<ElementaryTokenMove> moves = new ArrayList<>();
         moves.add(new ElementaryTokenMove(5, 5));
 
         nts.moveVC(Game.GamePhase.PHASE_TWO, moves);
 
-        assertEquals('C', b.getTokenAt(5, 5));
+        assertEquals('C', b.getTokenAt(new Coordinates(5, 5)));
     }
 
     @Test
@@ -61,7 +62,7 @@ class NatureTokenSetTest {
         Executable performIllegalMove = () -> {
             Board b = new Board();
             NatureTokenSet nts = new NatureTokenSet(b);
-            nts.placeVC(Game.GamePhase.PHASE_TWO, 5, 4);
+            nts.placeVC(Game.GamePhase.PHASE_TWO, new Coordinates(5, 4));
 
             List<ElementaryTokenMove> moves = new ArrayList<>();
 
@@ -74,12 +75,12 @@ class NatureTokenSetTest {
     }
 
     @Test
-    public void testIllegalMoveThroughOtherToken() throws InvalidPlacementException {
+    public void testIllegalMoveThroughOtherToken() throws InvalidPlacementException, InvalidCoordinatesException {
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
 
-        nts.placeVC(Game.GamePhase.PHASE_TWO, 2, 2);
-        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 6), 0, 3, Token.Orientation.HORIZONTAL);
+        nts.placeVC(Game.GamePhase.PHASE_TWO, new Coordinates(2, 2));
+        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 6), new Coordinates(0, 3), Token.Orientation.HORIZONTAL);
 
         assertEquals("---------------\n" +
                 "---------------\n" +
@@ -109,14 +110,14 @@ class NatureTokenSetTest {
     }
 
     @Test
-    public void testLegalMove() throws InvalidPlacementException, InvalidMoveException {
+    public void testLegalMove() throws InvalidPlacementException, InvalidMoveException, InvalidCoordinatesException {
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
 
-        nts.placeVC(Game.GamePhase.PHASE_TWO, 10, 10);
-        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 7), 10, 9, Token.Orientation.HORIZONTAL);
-        assertEquals('C', b.getTokenAt(10, 10));
-        assertEquals('-', b.getTokenAt(9, 9));
+        nts.placeVC(Game.GamePhase.PHASE_TWO, new Coordinates(10, 10));
+        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 7), new Coordinates(10, 9), Token.Orientation.HORIZONTAL);
+        assertEquals('C', b.getTokenAt(new Coordinates(10, 10)));
+        assertEquals('-', b.getTokenAt(new Coordinates(9, 9)));
         assertEquals("---------------\n" +
                 "---------------\n" +
                 "---------------\n" +
@@ -139,15 +140,15 @@ class NatureTokenSetTest {
         assertEquals(4, nts.countStepsAndCheckIfLegal(Game.GamePhase.PHASE_TWO, moves));
         nts.moveVC(Game.GamePhase.PHASE_TWO, moves);
 
-        assertEquals('-', b.getTokenAt(10, 10));
-        assertEquals('C', b.getTokenAt(10, 8));
+        assertEquals('-', b.getTokenAt(new Coordinates(10, 10)));
+        assertEquals('C', b.getTokenAt(new Coordinates(10, 8)));
     }
 
     @Test
-    public void testReachableFieldsCalc() throws InvalidPlacementException {
+    public void testReachableFieldsCalc() throws InvalidPlacementException, InvalidCoordinatesException {
         Board b = new Board();
         NatureTokenSet nts = new NatureTokenSet(b);
-        nts.placeVC(Game.GamePhase.PHASE_ONE, 5, 5);
+        nts.placeVC(Game.GamePhase.PHASE_ONE, new Coordinates(5, 5));
 
         assertEquals(Board.BOARD_WIDTH * Board.BOARD_HEIGHT - 1,
                 nts.getNumOfReachableFields(Game.GamePhase.PHASE_ONE));

@@ -82,9 +82,9 @@ class UserInputParserTest {
     public void testCoordinateArg() {
         UserInputParser parser = new UserInputParser();
 
-        ElementaryTokenMove result = parser.parseCoordinates("5;33");
-        assertEquals(5, result.getDstY());
-        assertEquals(33, result.getDstX());
+        Coordinates result = parser.parseCoordinates("5;33");
+        assertEquals(5, result.getY());
+        assertEquals(33, result.getX());
     }
 
     @Test
@@ -92,19 +92,19 @@ class UserInputParserTest {
         Executable parseMalformedCoordinateArg = () -> {
             UserInputParser parser = new UserInputParser();
 
-            ElementaryTokenMove result = parser.parseCoordinates("5;3a3");
+            Coordinates result = parser.parseCoordinates("5;3a3");
         };
 
         Executable parseHexCoordinateArg = () -> {
             UserInputParser parser = new UserInputParser();
 
-            ElementaryTokenMove result = parser.parseCoordinates("0x03;0x22");
+            Coordinates result = parser.parseCoordinates("0x03;0x22");
         };
 
         Executable parseNegativeCoordinateArg = () -> {
             UserInputParser parser = new UserInputParser();
 
-            ElementaryTokenMove result = parser.parseCoordinates("5;-5");
+            Coordinates result = parser.parseCoordinates("5;-5");
         };
 
         assertThrows(IllegalArgumentException.class, parseMalformedCoordinateArg);

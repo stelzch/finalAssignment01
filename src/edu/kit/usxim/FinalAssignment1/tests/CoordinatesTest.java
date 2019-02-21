@@ -1,5 +1,6 @@
-package edu.kit.usxim.FinalAssignment1;
+package edu.kit.usxim.FinalAssignment1.tests;
 
+import edu.kit.usxim.FinalAssignment1.Coordinates;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

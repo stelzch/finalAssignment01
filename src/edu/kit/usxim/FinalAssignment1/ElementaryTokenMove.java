@@ -16,30 +16,13 @@ public class ElementaryTokenMove extends Coordinates {
     }
 
     /**
-     * @return the destination x coordinate of the move
+     * Copy constructor
+     * @param other another token move to copy from
      */
-    public int getDstX() {
-        return dstX;
+    public ElementaryTokenMove(Coordinates other) {
+        super(other.getX(), other.getY());
     }
 
-    /**
-     * @return the destination y coordinate of the move
-     */
-    public int getDstY() {
-        return dstY;
-    }
-
-    /**
-     * @return the string representation of the elementary move x;y
-     */
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(dstY);
-        sb.append(";");
-        sb.append(dstX);
-
-        return sb.toString();
-    }
 
     /**
      * Checks whether this elementary moves destination neighbors the given one directly (not diagonally)
@@ -47,26 +30,11 @@ public class ElementaryTokenMove extends Coordinates {
      * @return true if it is in the direct neighbourhood, false otherwise
      */
     public boolean isConnectedTo(ElementaryTokenMove other) {
-        int coordinateDistance = Math.abs(other.getDstX() - getDstX())
-                + Math.abs(other.getDstY() - getDstY());
+        int coordinateDistance = Math.abs(other.getX() - getX())
+                + Math.abs(other.getY() - getY());
         if (coordinateDistance <= 1)
             return true;
 
         return false;
-    }
-
-    /**
-     * Checks for equality
-     * @param o another instance of an elementary token move
-     * @return true if this one is equal to the other
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof ElementaryTokenMove) {
-            ElementaryTokenMove other = (ElementaryTokenMove) o;
-            return (getDstX() == other.getDstX() && getDstY() == other.getDstY());
-        }
-
-        throw new IllegalArgumentException("can only compare objects of same type");
     }
 }

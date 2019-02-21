@@ -2,27 +2,25 @@ package edu.kit.usxim.FinalAssignment1;
 
 public class Utils {
 
-    private static void throwErrorIfLineNotStraight(int x1, int y1, int x2, int y2) {
-        if (x1 != x2 && y1 != y2) {
+    private static void throwErrorIfLineNotStraight(Coordinates start, Coordinates end) {
+        if (start.getX() != end.getX() && start.getY() != end.getY()) {
             throw new IllegalArgumentException("the given coordinates are not in a straight line");
         }
     }
 
     /**
      * Check whether the specified line is straight, thus either
-     * @param x1 starting x
-     * @param y1 starting y
-     * @param x2 end x
-     * @param y2 end y
+     * @param start the starting coordinates
+     * @param end the ending coordiantes
      * @return the orientation of the line
      */
-    public static Token.Orientation getLineOrientation(int x1, int y1, int x2, int y2) {
-        throwErrorIfLineNotStraight(x1, y1, x2, y2);
+    public static Token.Orientation getLineOrientation(Coordinates start, Coordinates end) {
+        throwErrorIfLineNotStraight(start, end);
 
-        if (x1 == x2)
+        if (start.getX() == end.getX())
             return Token.Orientation.VERTICAL;
 
-        if (y1 == y2)
+        if (start.getY() == end.getY())
             return Token.Orientation.HORIZONTAL;
 
         throw new IllegalArgumentException("the given coordinates are weird!");
@@ -30,22 +28,20 @@ public class Utils {
 
     /**
      * Get the length of a line (including the ending and starting points)
-     * @param x1 the start x
-     * @param y1 the start y
-     * @param x2 the end x
-     * @param y2 the end y
+     * @param start the starting coordinates
+     * @param end the ending coordinates
      * @return the length of the line
      */
-    public static int getStraightLineLength(int x1, int y1, int x2, int y2) {
-        throwErrorIfLineNotStraight(x1, y1, x2, y2);
+    public static int getStraightLineLength(Coordinates start, Coordinates end) {
+        throwErrorIfLineNotStraight(start, end);
 
-        Token.Orientation or = getLineOrientation(x1, y1, x2, y2);
+        Token.Orientation or = getLineOrientation(start, end);
 
         switch (or) {
             case HORIZONTAL:
-                return Math.abs(x1 - x2) + 1;
+                return Math.abs(start.getX() - end.getX()) + 1;
             case VERTICAL:
-                return Math.abs(y1 - y2) + 1;
+                return Math.abs(start.getY() - end.getY()) + 1;
             default:
                 return 0;
         }
