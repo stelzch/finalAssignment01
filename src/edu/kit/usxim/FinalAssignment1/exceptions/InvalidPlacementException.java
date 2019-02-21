@@ -1,6 +1,6 @@
 package edu.kit.usxim.FinalAssignment1.exceptions;
 
-public class InvalidPlacementException extends Exception {
+public class InvalidPlacementException extends GameException {
     /**
      * Create a new InvalidPlacementException
      */

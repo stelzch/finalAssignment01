@@ -2,10 +2,9 @@ package edu.kit.usxim.FinalAssignment1.exceptions;
 
 import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
 
-public class InvalidMoveException extends Exception {
+public class InvalidMoveException extends GameException {
     /**
      * Create a new InvalidMoveException
-     * @param s
      */
     public InvalidMoveException() {
         super("the move was invalid");

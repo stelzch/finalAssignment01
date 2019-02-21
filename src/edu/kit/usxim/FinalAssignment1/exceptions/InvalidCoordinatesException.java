@@ -2,7 +2,7 @@ package edu.kit.usxim.FinalAssignment1.exceptions;
 
 import edu.kit.usxim.FinalAssignment1.Coordinates;
 
-public class InvalidCoordinatesException extends Exception {
+public class InvalidCoordinatesException extends GameException {
     /**
      * Create a new InvalidPlacementException
      */

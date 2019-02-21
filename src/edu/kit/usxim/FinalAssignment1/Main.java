@@ -1,6 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
 import edu.kit.informatik.Terminal;
+import edu.kit.usxim.FinalAssignment1.exceptions.GameException;
 import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
 import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
 import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
@@ -17,9 +18,8 @@ public class Main {
 
             try {
                 Terminal.printLine(parser.parseInput(line));
-            } catch (InvalidDiceNumberException | InvalidMoveException |
-                    IllegalArgumentException | InvalidCoordinatesException e) {
-                Terminal.printError( e.getMessage());
+            } catch (GameException e) {
+                Terminal.printError(e.getMessage());
             }
         }
     }

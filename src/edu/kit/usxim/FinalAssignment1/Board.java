@@ -40,8 +40,8 @@ public class Board {
                 lookupCoordinates.setY(y);
                 try {
                     board[y][x] = other.getTokenAt(lookupCoordinates);
-                } catch (InvalidCoordinatesException e){
-                    throw new RuntimeException("Board dimension coordinates are invalid");
+                } catch (InvalidCoordinatesException e) {
+                    throw new RuntimeException("board dimension coordinates are invalid");
                 }
             }
         }
@@ -61,6 +61,7 @@ public class Board {
      *
      * @param target the target coordinates
      * @return the character representation at the given coordinates
+     * @throws InvalidCoordinatesException if the target coordinates are not located on the board
      */
     public char getTokenAt(Coordinates target) throws InvalidCoordinatesException {
         throwErrorForInvalidCoords(target);
@@ -71,6 +72,7 @@ public class Board {
      * Set the field state
      * @param target the target coordinates
      * @param c the character to set it to
+     * @throws InvalidCoordinatesException if the target coordinates are not located on the board
      */
     public void setTokenAt(Coordinates target, char c) throws InvalidCoordinatesException {
         throwErrorForInvalidCoords(target);
@@ -92,7 +94,8 @@ public class Board {
             throw new InvalidCoordinatesException("y coordinate must be bigger than " + BOARD_HEIGHT);
     }
 
-    private void throwErrorForInvalidPlacement(Coordinates start, Coordinates end) throws InvalidPlacementException, InvalidCoordinatesException {
+    private void throwErrorForInvalidPlacement(Coordinates start, Coordinates end) throws InvalidPlacementException,
+            InvalidCoordinatesException {
         throwErrorForInvalidCoords(start);
         throwErrorForInvalidCoords(end);
 
@@ -101,7 +104,8 @@ public class Board {
         }
     }
 
-    private void throwErrorForInvalidDawnPlacement(Coordinates start, Coordinates end) throws InvalidPlacementException {
+    private void throwErrorForInvalidDawnPlacement(Coordinates start, Coordinates end)
+            throws InvalidPlacementException {
         // Either the start or the end must be on the field
         if (isFieldOnBoard(start) || isFieldOnBoard(end)) {
             return;
@@ -117,8 +121,10 @@ public class Board {
      * @param pos the position where to place the coordinates
      * @param orientation the token orientation
      * @throws InvalidPlacementException if the placement is incorrect
+     * @throws InvalidCoordinatesException if the target coordinates are not located on the board
      */
-    public void placeToken(Token token, Coordinates pos, Token.Orientation orientation) throws InvalidPlacementException, InvalidCoordinatesException {
+    public void placeToken(Token token, Coordinates pos, Token.Orientation orientation)
+            throws InvalidPlacementException, InvalidCoordinatesException {
         int endX = pos.getX();
         int endY = pos.getY();
 
@@ -130,6 +136,7 @@ public class Board {
 
 
         Coordinates endingCoordinates = new Coordinates(endX, endY);
+
         // Check if the coordinates are out of bounds, but for the DAWN token, special rules apply
         if (token.getSize() == Token.DAWN_SIZE) {
             throwErrorForInvalidDawnPlacement(pos, endingCoordinates);
@@ -139,8 +146,7 @@ public class Board {
 
 
         if (checkFieldsUnoccupied(pos, endingCoordinates)) {
-            setLineOfFieldsToChar(token.toString().charAt(0),
-                    pos.getX(), pos.getY(), endingCoordinates.getX(), endingCoordinates.getY());
+            setLineOfFieldsToChar(token.toString().charAt(0), pos, endingCoordinates);
         } else {
             throw new InvalidPlacementException("some of the fields this token would inhabit are already occupied");
         }
@@ -185,16 +191,19 @@ public class Board {
     /**
      * Set all the fields between the given coordinates that reside on the board to a specific character
      * @param c the character to set the fields to
-     * @param startX self-explanatory
-     * @param startY self-explanatory
-     * @param endX self-explanatory
-     * @param endY self-explanatory
+     * @param start the starting coordinates
+     * @param end the ending coordinates (must be larger than starting coords)
+     * @throws InvalidCoordinatesException if the coordinates are not located on the board
      */
-    private void setLineOfFieldsToChar(char c, int startX, int startY, int endX, int endY) {
-        for (int x = startX; x <= endX; x++) {
-            for (int y = startY; y <= endY; y++) {
-                if (isFieldOnBoard(new Coordinates(x, y)))
-                    board[y][x] = c;
+    private void setLineOfFieldsToChar(char c, Coordinates start, Coordinates end) throws InvalidCoordinatesException {
+        Coordinates lookupCoordinates = new Coordinates(0, 0);
+        for (int x = start.getX(); x <= end.getX(); x++) {
+            for (int y = start.getY(); y <= end.getY(); y++) {
+                lookupCoordinates.setX(x);
+                lookupCoordinates.setY(y);
+
+                if (isFieldOnBoard(lookupCoordinates))
+                    setTokenAt(lookupCoordinates, c);
             }
         }
     }

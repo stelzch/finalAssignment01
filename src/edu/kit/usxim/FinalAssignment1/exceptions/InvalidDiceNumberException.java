@@ -1,6 +1,6 @@
 package edu.kit.usxim.FinalAssignment1.exceptions;
 
-public class InvalidDiceNumberException extends Exception {
+public class InvalidDiceNumberException extends GameException {
     /**
      * Create a new InvalidPlacementException
      */

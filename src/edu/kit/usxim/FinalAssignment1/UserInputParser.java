@@ -1,8 +1,6 @@
 package edu.kit.usxim.FinalAssignment1;
 
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
+import edu.kit.usxim.FinalAssignment1.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,7 @@ public class UserInputParser {
         this.executor = new Game();
     }
 
-    private void throwErrorForInvalidCoordinate(String input) throws IllegalArgumentException{
+    private void throwErrorForInvalidCoordinate(String input) throws IllegalArgumentException {
         throw new IllegalArgumentException("not a valid coordinate: " + input);
     }
 
@@ -49,6 +47,11 @@ public class UserInputParser {
         return null;
     }
 
+    /**
+     * Parse a list of Coordinates
+     * @param input an input string of the form m1;n1:m2;n2:[...]
+     * @return a list of elementary token moves
+     */
     public List<ElementaryTokenMove> parseCoordinateList(String input) {
         if (!input.matches("[0-9]+;[0-9]+(:[0-9]+;[0-9]+)+"))
             throw new IllegalArgumentException("invalid coordinate format - must be m1;n1:m2;n2 and so on");
@@ -90,8 +93,12 @@ public class UserInputParser {
      * Parse the provided input and execute it
      * @param line the line the user inputs
      * @return any output the routine provides
+     * @throws InvalidMoveException if the movement was invalid
+     * @throws InvalidCoordinatesException if the provided coordinates were unfit
+     * @throws InvalidDiceNumberException if the dice roll input did not match
+     * @throws InvalidPlacementException if the provided placement coordinates were weird
      */
-    public String parseInput(String line) throws InvalidMoveException, InvalidCoordinatesException, InvalidDiceNumberException {
+    public String parseInput(String line) throws GameException {
         String[] commandParts = parseCommandIntoNameAndArgs(line);
         String commandName = commandParts[0];
         String commandArgs = commandParts[1];
@@ -108,7 +115,9 @@ public class UserInputParser {
                 List<ElementaryTokenMove> moves = parseCoordinateList(commandArgs);
                 if (moves.size() != 2)
                     throw new IllegalArgumentException("must provide start and end: place <m1>;<n1>:<m2>;<n2>");
-                return executor.move(moves);
+                Coordinates start = moves.get(0);
+                Coordinates end = moves.get(1);
+                return executor.place(start, end);
             case "move":
             default:
                 throw new IllegalArgumentException("did not recognise command");
