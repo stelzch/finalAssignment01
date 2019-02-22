@@ -8,7 +8,7 @@ import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
 import edu.kit.usxim.FinalAssignment1.exceptions.InvalidPlacementException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FreeFieldCounterTest {
 
@@ -46,9 +46,9 @@ class FreeFieldCounterTest {
     public void testEntrappedVesta() throws InvalidCoordinatesException {
         Board b = new Board();
         b.setTokenAt(new Coordinates(0, 0), 'V');
-        b.setTokenAt(new Coordinates(1,1), '+');
-        b.setTokenAt(new Coordinates(0,1), '+');
-        b.setTokenAt(new Coordinates(1,0), '+');
+        b.setTokenAt(new Coordinates(1, 1), '+');
+        b.setTokenAt(new Coordinates(0, 1), '+');
+        b.setTokenAt(new Coordinates(1, 0), '+');
 
         FreeFieldCounter counter = new FreeFieldCounter(b, new Coordinates(0, 0));
         assertEquals(0, counter.countReachableTokens());
@@ -58,7 +58,7 @@ class FreeFieldCounterTest {
     public void testSplitGameBoard() throws InvalidCoordinatesException {
         Board b = new Board();
         Coordinates lookupCoordinates = new Coordinates(0, 0);
-        for (int i=0; i<Board.BOARD_WIDTH; i++) {
+        for (int i = 0; i < Board.BOARD_WIDTH; i++) {
             lookupCoordinates.setX(i);
             lookupCoordinates.setY(6);
             b.setTokenAt(lookupCoordinates, '+');

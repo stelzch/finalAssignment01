@@ -1,5 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
+import java.util.Objects;
+
 public class Coordinates extends Object {
     /** The x-coordinate */
     protected int x;
@@ -56,6 +58,14 @@ public class Coordinates extends Object {
         }
 
         throw new IllegalArgumentException("objects to compare must both be of type Coordinates");
+    }
+
+    /**
+     * @return get a hash value
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
     /**

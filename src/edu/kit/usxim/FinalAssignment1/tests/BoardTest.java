@@ -22,7 +22,7 @@ class BoardTest {
     @Test
     public void testFieldUnoccupied() throws InvalidPlacementException, InvalidCoordinatesException {
         Board b = new Board();
-        b.placeToken(new Token(Token.Type.VESTA, 1), new Coordinates(5,4), Token.Orientation.HORIZONTAL);
+        b.placeToken(new Token(Token.Type.VESTA, 1), new Coordinates(5, 4), Token.Orientation.HORIZONTAL);
 
         assertTrue(b.checkFieldUnoccupied(new Coordinates(0, 0)));
         assertFalse(b.checkFieldUnoccupied(new Coordinates(5, 4)));

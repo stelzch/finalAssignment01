@@ -175,7 +175,7 @@ public class Game implements PlayerCommandExecutor {
      * @return an integer between 2 and 7
      */
     private int parseDiceSymbol(String symbol) throws InvalidDiceNumberException {
-        if (symbol.matches("[2-7]")) {
+        if (symbol.matches("[2-6]")) {
             return Integer.parseInt(symbol);
         } else if (symbol.equals("DAWN")) {
             return 7;
@@ -277,16 +277,18 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String move(List<ElementaryTokenMove> moves) throws InvalidMoveException, InvalidCoordinatesException, InvalidCommandException {
+    public String move(List<ElementaryTokenMove> moves)
+            throws InvalidMoveException, InvalidCoordinatesException, InvalidCommandException {
         throwErrorIfRequestStateMismatch(GameState.VC_MOVEMENT_EXPECTED);
         throwErrorIfDiceNumberUnset();
 
-        if (moves.size() == 0)
-            throw new InvalidMoveException("need to specify at least move");
 
         int stepsRequiredForMove = natureTokenSet.countStepsAndCheckIfLegal(phase, moves);
         if (stepsRequiredForMove > lastDiceRoll)
             throw new InvalidMoveException("this step requires a dice roll of " + stepsRequiredForMove);
+
+        if (stepsRequiredForMove == 0)
+            throw new InvalidMoveException("need to specify at least move");
 
         natureTokenSet.moveVC(phase, moves);
 

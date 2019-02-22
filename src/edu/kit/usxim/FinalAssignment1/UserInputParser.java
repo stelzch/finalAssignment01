@@ -1,7 +1,9 @@
 package edu.kit.usxim.FinalAssignment1;
 
-import edu.kit.usxim.FinalAssignment1.exceptions.*;
-import org.omg.CORBA.DynAnyPackage.Invalid;
+import edu.kit.usxim.FinalAssignment1.exceptions.GameException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCommandException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
+import edu.kit.usxim.FinalAssignment1.exceptions.ProgramQuitRequestException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,11 @@ public class UserInputParser {
         throw new InvalidCoordinatesException("not a valid coordinate: " + input);
     }
 
+    private void throwErrorArgsExpectedEmpty(String args) throws InvalidCommandException {
+        if (!args.isEmpty())
+            throw new InvalidCommandException("did not expect any arguments");
+    }
+
     /**
      * Parse a coordinate tuple into integers
      * @param input the user input of two numbers separated by a semicolon
@@ -29,7 +36,7 @@ public class UserInputParser {
      * @throws InvalidCoordinatesException if the provided input is malformed
      */
     public Coordinates parseCoordinates(String input) throws InvalidCoordinatesException {
-        if (!input.matches("[0-9]+;[0-9]+"))
+        if (!input.matches("-?[0-9]+;-?[0-9]+"))
             throwErrorForInvalidCoordinate(input);
 
         String[] parts = input.split(";");
@@ -57,7 +64,7 @@ public class UserInputParser {
      */
     public List<ElementaryTokenMove> parseCoordinateList(String input)
             throws InvalidCoordinatesException, InvalidCommandException {
-        if (!input.matches("[0-9]+;[0-9]+(:[0-9]+;[0-9]+)*"))
+        if (!input.matches("-?[0-9]+;-?[0-9]+(:-?[0-9]+;-?[0-9]+)*"))
             throw new InvalidCommandException("invalid coordinate format - must be m1;n1:m2;n2 and so on");
 
         String[] coordinateList = input.split(":");
@@ -108,6 +115,7 @@ public class UserInputParser {
 
         switch (commandName) {
             case "print":
+                throwErrorArgsExpectedEmpty(commandArgs);
                 return executor.print();
             case "state":
                 Coordinates coords = parseCoordinates(commandArgs);
@@ -128,9 +136,11 @@ public class UserInputParser {
                 Coordinates target = parseCoordinates(commandArgs);
                 return executor.setVC(target);
             case "reset":
+                throwErrorArgsExpectedEmpty(commandArgs);
                 this.executor = new Game();
                 return "OK";
             case "quit":
+                throwErrorArgsExpectedEmpty(commandArgs);
                 throw new ProgramQuitRequestException("user requested exit");
             default:
                 throw new InvalidCommandException("did not recognise command: " + commandName);

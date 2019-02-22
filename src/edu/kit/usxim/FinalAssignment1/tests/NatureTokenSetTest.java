@@ -1,10 +1,12 @@
 package edu.kit.usxim.FinalAssignment1.tests;
 
 import edu.kit.usxim.FinalAssignment1.*;
+import edu.kit.usxim.FinalAssignment1.exceptions.GameException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidPlacementException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import edu.kit.usxim.FinalAssignment1.exceptions.*;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,5 +154,80 @@ class NatureTokenSetTest {
 
         assertEquals(Board.BOARD_WIDTH * Board.BOARD_HEIGHT - 1,
                 nts.getNumOfReachableFields(Game.GamePhase.PHASE_ONE));
+    }
+
+    @Test
+    public void testMoveVestaBackToSamePosition() throws GameException {
+        Board b = new Board();
+        NatureTokenSet nts = new NatureTokenSet(b);
+
+        Coordinates field1 = new Coordinates(4, 3);
+        Coordinates field2 = new Coordinates(3, 3);
+
+        nts.placeVC(Game.GamePhase.PHASE_ONE, field1);
+        List<ElementaryTokenMove> moves = new ArrayList<>();
+        moves.add(new ElementaryTokenMove(field2));
+        moves.add(new ElementaryTokenMove(field1));
+
+        nts.moveVC(Game.GamePhase.PHASE_ONE, moves);
+
+        System.out.println(b.toString());
+        assertEquals('V', b.getTokenAt(field1));
+    }
+
+    @Test
+    public void testMoveVestaOverEnclosedCeres() throws GameException {
+        Board b = new Board();
+        NatureTokenSet nts = new NatureTokenSet(b);
+
+        b.setTokenAt(new Coordinates(0, 1), '+');
+        b.setTokenAt(new Coordinates(1, 1), '+');
+        b.setTokenAt(new Coordinates(2, 1), '+');
+        b.setTokenAt(new Coordinates(2, 0), '+');
+
+        Coordinates pos1 = new Coordinates(0, 0);
+        Coordinates pos2 = new Coordinates(1, 0);
+
+        nts.placeVC(Game.GamePhase.PHASE_ONE, pos1);
+        nts.placeVC(Game.GamePhase.PHASE_TWO, pos2);
+
+        assertTrue(b.toString().startsWith("VC+"));
+
+        List<ElementaryTokenMove> moves = new ArrayList<>();
+        moves.add(new ElementaryTokenMove(pos2));
+        moves.add(new ElementaryTokenMove(pos1));
+
+        try {
+            nts.moveVC(Game.GamePhase.PHASE_ONE, moves);
+        } catch (InvalidMoveException e) {
+            assertTrue(e.getMessage().startsWith("cant move through 0;1"));
+            return;
+        }
+
+        fail("Should throw exception, as we cant move through Ceres");
+    }
+
+    @Test
+    public void testVCMovementPhaseDifferentiation() throws GameException {
+        Coordinates vestaPos = new Coordinates(2, 3);
+        Coordinates ceresPos = new Coordinates(9, 7);
+
+        Coordinates adjacentPos = new Coordinates(2, 4);
+
+        Board b = new Board();
+        NatureTokenSet nts = new NatureTokenSet(b);
+        nts.placeVC(Game.GamePhase.PHASE_ONE, vestaPos);
+        nts.placeVC(Game.GamePhase.PHASE_TWO, ceresPos);
+
+        try {
+            List<ElementaryTokenMove> moves = new ArrayList<>();
+            moves.add(new ElementaryTokenMove(adjacentPos));
+
+            nts.moveVC(Game.GamePhase.PHASE_TWO, moves);
+        } catch (InvalidMoveException e) {
+            assertEquals("impossible to move to 4;2", e.getMessage());
+            return;
+        }
+        fail("should throw error as field is adjacent to vesta, not ceres");
     }
 }

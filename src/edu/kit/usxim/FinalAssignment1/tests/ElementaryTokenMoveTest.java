@@ -1,12 +1,9 @@
 package edu.kit.usxim.FinalAssignment1.tests;
 
-import edu.kit.usxim.FinalAssignment1.*;
+import edu.kit.usxim.FinalAssignment1.Coordinates;
+import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
-import javax.xml.bind.Element;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,5 +80,13 @@ class ElementaryTokenMoveTest {
         assertFalse(upperRight.isConnectedTo(center));
         assertFalse(lowerLeft.isConnectedTo(center));
         assertFalse(lowerRight.isConnectedTo(center));
+    }
+
+    @Test
+    public void testEqualsToCoordinates() {
+        ElementaryTokenMove movePos = new ElementaryTokenMove(2, 3);
+        Coordinates coordPos = new Coordinates(2, 3);
+
+        assertTrue(coordPos.equals(movePos));
     }
 }

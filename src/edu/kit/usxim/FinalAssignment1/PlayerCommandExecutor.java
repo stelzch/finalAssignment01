@@ -44,10 +44,9 @@ public interface PlayerCommandExecutor {
      * @param start the starting coordinates
      * @param end the ending coordinates
      * @return status message
-     * @throws InvalidPlacementException if the placement was illegal
-     * @throws InvalidCoordinatesException if the provided coordinates are not located on the board
+     * @throws GameException if either the placement was illegal, the command unexpected or the coordinates invalid
      */
-    String place(Coordinates start, Coordinates end) throws InvalidPlacementException, InvalidCoordinatesException, InvalidCommandException;
+    String place(Coordinates start, Coordinates end) throws GameException;
 
     /**
      * Execute the provided elementary moves one after the other

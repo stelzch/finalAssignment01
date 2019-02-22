@@ -21,7 +21,7 @@ public class MissionControlTokenSet implements PlayingTokenSet {
      * Default constructor
      */
     public MissionControlTokenSet() {
-        availableTokens = new TreeSet();
+        availableTokens = new TreeSet<Token>();
 
         for (int i = MINIMUM_TOKEN_SIZE; i <= MAXIMUM_TOKEN_SIZE; i++) {
             availableTokens.add(new Token(Token.Type.MISSION_CONTROL, i));

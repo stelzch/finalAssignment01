@@ -12,6 +12,11 @@
         <property name="fileExtensions" value=""/>
     </module>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="suppressionFilter.xml" />
+        <property name="optional" value="false" />
+    </module>
+
     <module name="com.puppycrawl.tools.checkstyle.TreeWalker">
 
         <!-- See http://checkstyle.sf.net/config_sizes.html !-->

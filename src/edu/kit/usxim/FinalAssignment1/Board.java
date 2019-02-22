@@ -220,7 +220,8 @@ public class Board {
         throwErrorForInvalidCoords(end);
 
         board[end.getY()][end.getX()] = board[start.getY()][start.getX()];
-        board[start.getY()][start.getX()] = UNOCCUPIED_FIELD;
+        if (!start.equals(end))
+            board[start.getY()][start.getX()] = UNOCCUPIED_FIELD;
     }
     /**
      * Get string-representation of board

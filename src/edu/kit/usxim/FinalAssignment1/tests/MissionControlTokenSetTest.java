@@ -1,9 +1,9 @@
 package edu.kit.usxim.FinalAssignment1.tests;
 
-import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
 import edu.kit.usxim.FinalAssignment1.MissionControlTokenSet;
 import edu.kit.usxim.FinalAssignment1.PlayingTokenSet;
 import edu.kit.usxim.FinalAssignment1.Token;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidDiceNumberException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 

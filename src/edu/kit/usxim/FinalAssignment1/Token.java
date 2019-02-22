@@ -1,6 +1,8 @@
 package edu.kit.usxim.FinalAssignment1;
 
 
+import java.util.Objects;
+
 public class Token extends Object implements Comparable<Token> {
     /** the size in fields of the dawn token */
     public static final int DAWN_SIZE = 7;
@@ -162,5 +164,10 @@ public class Token extends Object implements Comparable<Token> {
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, size);
     }
 }

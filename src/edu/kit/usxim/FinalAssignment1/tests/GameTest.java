@@ -1,10 +1,11 @@
 package edu.kit.usxim.FinalAssignment1.tests;
 
-import edu.kit.usxim.FinalAssignment1.*;
+import edu.kit.usxim.FinalAssignment1.Coordinates;
+import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
+import edu.kit.usxim.FinalAssignment1.Game;
 import edu.kit.usxim.FinalAssignment1.exceptions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,9 @@ class GameTest {
 
     /**
      * Assert that the game looks like the string given in repr
+     *
      * @param repr the expected game board representation as string
-     * @param g the game
+     * @param g    the game
      */
     private void assertGameBoardState(String repr, Game g) {
         assertEquals(repr, g.print());
@@ -36,7 +38,7 @@ class GameTest {
 
         g.setVC(new Coordinates(0, 0));
 
-        for (int i=1; i <= 6; i++) {
+        for (int i = 1; i <= 6; i++) {
             System.out.println("Round " + i);
             assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
             g.moveToNextState();
@@ -49,7 +51,7 @@ class GameTest {
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
         g.setVC(new Coordinates(2, 2));
 
-        for (int i=1; i <= 6; i++) {
+        for (int i = 1; i <= 6; i++) {
             System.out.println("Round " + i);
             assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
             g.moveToNextState();
@@ -74,31 +76,31 @@ class GameTest {
     public void testBasicPlacement() throws GameException {
         Game g = new Game();
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
-        g.setVC(new Coordinates( 3, 2));
+        g.setVC(new Coordinates(3, 2));
         g.roll("3");
         g.place(new Coordinates(0, 0), new Coordinates(2, 0));
 
         assertGameBoardState(
                 "+++------------\n" +
-                "---------------\n" +
-                "---V-----------\n" +
-                "---------------\n" +
-                "---------------\n" +
-                "---------------\n" +
-                "---------------\n" +
-                "---------------\n" +
-                "---------------\n" +
-                "---------------\n" +
-                "---------------", g);
+                        "---------------\n" +
+                        "---V-----------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------\n" +
+                        "---------------", g);
 
-        assertEquals("V", g.state(new Coordinates( 3, 2)));
-        assertEquals("+", g.state(new Coordinates( 2, 0)));
-        }
+        assertEquals("V", g.state(new Coordinates(3, 2)));
+        assertEquals("+", g.state(new Coordinates(2, 0)));
+    }
 
     @Test
     public void testDawnPlacement() throws GameException {
         Game g = new Game();
-        g.setVC(new Coordinates( 2, 5));
+        g.setVC(new Coordinates(2, 5));
         g.roll("DAWN");
 
         g.place(new Coordinates(-5, 0), new Coordinates(1, 0));
@@ -118,7 +120,7 @@ class GameTest {
 
         /* Try another game */
         g = new Game();
-        g.setVC(new Coordinates(   14,   9));
+        g.setVC(new Coordinates(14, 9));
         g.roll("DAWN");
         g.place(new Coordinates(19, 10), new Coordinates(13, 10));
 
@@ -205,7 +207,7 @@ class GameTest {
         g.place(new Coordinates(5, 0), new Coordinates(5, 1));
         g.move(moveOneStepForward);
 
-        assertEquals("V", g.state(new Coordinates( 1, 0)));
+        assertEquals("V", g.state(new Coordinates(1, 0)));
 
         g.roll("2");
         g.place(new Coordinates(6, 0), new Coordinates(6, 2));
@@ -249,7 +251,7 @@ class GameTest {
                         "---------------", g);
 
         // Round 2
-        g.setVC(new Coordinates( 1, 0));
+        g.setVC(new Coordinates(1, 0));
         for (int round = 2; round <= 7; round++) {
             g.roll((round == 7) ? "DAWN" : String.valueOf(round));
             g.place(new Coordinates(14, round), new Coordinates(14 - (round - 1), round));
@@ -279,7 +281,7 @@ class GameTest {
             g.setVC(new Coordinates(0, 0));
 
             g.roll("DAWN");
-            g.place(new Coordinates(1, 0), new Coordinates(1+6, 0));
+            g.place(new Coordinates(1, 0), new Coordinates(1 + 6, 0));
             g.move(new ArrayList<ElementaryTokenMove>());
         };
 
@@ -288,12 +290,13 @@ class GameTest {
             g.setVC(new Coordinates(0, 0));
 
             g.roll("DAWN");
-            g.place(new Coordinates(1, 0), new Coordinates(1+6, 0));
+            g.place(new Coordinates(1, 0), new Coordinates(1 + 6, 0));
 
-            List<ElementaryTokenMove> moves  = new ArrayList<>();
+            List<ElementaryTokenMove> moves = new ArrayList<>();
             moves.add(new ElementaryTokenMove(0, 0));
             moves.add(new ElementaryTokenMove(0, 0));
             g.move(moves);
+            System.out.println(g.print());
         };
 
         assertThrows(InvalidMoveException.class, moveWithEmptyList);
@@ -305,6 +308,7 @@ class GameTest {
         list.add(move);
         return list;
     }
+
     @Test
     public void testImmovableVesta() throws GameException {
         Game g = new Game();
@@ -322,5 +326,25 @@ class GameTest {
         } catch (InvalidCommandException e) {
             fail("as vesta can not be moved the vesta movement step should be skipped");
         }
+    }
+
+    @Test
+    public void testIllegalDiceSymbols() {
+        Executable sevenInsteadOfDawn = () -> {
+            Game g = new Game();
+            g.setVC(new Coordinates(0, 0));
+
+            g.roll("7");
+        };
+
+        Executable glibberishDiceNumber = () -> {
+            Game g = new Game();
+            g.setVC(new Coordinates(0, 0));
+
+            g.roll("5 53");
+        };
+
+        assertThrows(InvalidDiceNumberException.class, sevenInsteadOfDawn);
+        assertThrows(InvalidDiceNumberException.class, glibberishDiceNumber);
     }
 }

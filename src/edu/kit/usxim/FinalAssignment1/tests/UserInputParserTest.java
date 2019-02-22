@@ -76,7 +76,7 @@ class UserInputParserTest {
 
         try {
             String[] result = parser.parseCommandIntoNameAndArgs(" argsonly");
-         } catch (InvalidCommandException e) {
+        } catch (InvalidCommandException e) {
             assertTrue(e.getMessage().startsWith("invalid command format"));
             return;
         }
@@ -85,7 +85,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testCoordinateArg() throws GameException  {
+    public void testCoordinateArg() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         Coordinates result = parser.parseCoordinates("5;33");
@@ -115,7 +115,7 @@ class UserInputParserTest {
 
         assertThrows(InvalidCoordinatesException.class, parseMalformedCoordinateArg);
         assertThrows(InvalidCoordinatesException.class, parseHexCoordinateArg);
-        assertThrows(InvalidCoordinatesException.class, parseNegativeCoordinateArg);
+        assertDoesNotThrow(parseNegativeCoordinateArg);
     }
 
     @Test

@@ -12,7 +12,7 @@ public class NatureTokenSet {
     private Token ceres;
 
     /** The coordinates of the placed tokens are needed to move them */
-    private Coordinates ceresPositon;
+    private Coordinates ceresPosition;
     private Coordinates vestaPosition;
 
     /** The Board the game is placed on */
@@ -28,7 +28,7 @@ public class NatureTokenSet {
         ceres = new Token(Token.Type.CERES, Token.VESTA_OR_CERES_SIZE);
 
         vestaPosition = new Coordinates(-1, -1);
-        ceresPositon = new Coordinates(-1, -1);
+        ceresPosition = new Coordinates(-1, -1);
 
         this.board = board;
     }
@@ -42,7 +42,7 @@ public class NatureTokenSet {
         if (phase == Game.GamePhase.PHASE_ONE)  {
             return (vestaPosition.getX() != -1 && vestaPosition.getY() != -1);
         } else {
-            return (ceresPositon.getX() != -1 && ceresPositon.getY() != -1);
+            return (ceresPosition.getX() != -1 && ceresPosition.getY() != -1);
         }
     }
 
@@ -55,7 +55,7 @@ public class NatureTokenSet {
     }
 
     private Coordinates getCoordinatesRelevantForPhase(Game.GamePhase phase) {
-        return (phase == Game.GamePhase.PHASE_ONE) ? vestaPosition : ceresPositon;
+        return (phase == Game.GamePhase.PHASE_ONE) ? vestaPosition : ceresPosition;
     }
 
 
@@ -119,9 +119,16 @@ public class NatureTokenSet {
         }
     }
 
-    private void throwErrorIfDestinationOccupied(ElementaryTokenMove move)
+    private boolean fieldIsVC(Coordinates field, Game.GamePhase phase) throws InvalidCoordinatesException {
+        char vcInitial = getTokenRelevantForPhase(phase).toString().charAt(0);
+
+        return board.getTokenAt(field)  == vcInitial;
+    }
+
+    private void throwErrorIfDestinationOccupied(ElementaryTokenMove move, Game.GamePhase phase)
             throws InvalidMoveException, InvalidCoordinatesException {
-        if (board.checkFieldUnoccupied(move) == false) {
+        if (board.checkFieldUnoccupied(move) == false
+                && !fieldIsVC(move, phase)) {
             StringBuilder sb = new StringBuilder("cant move through ");
             sb.append(move);
             sb.append(" - field is occupied");
@@ -161,7 +168,7 @@ public class NatureTokenSet {
 
         for (ElementaryTokenMove nextMove : moves) {
             throwErrorIfMovesNotConnected(lastMove, nextMove);
-            throwErrorIfDestinationOccupied(nextMove);
+            throwErrorIfDestinationOccupied(nextMove, phase);
             throwErrorIfCoordinatesInvalid(nextMove);
 
             if (!nextMove.equals(lastMove))
