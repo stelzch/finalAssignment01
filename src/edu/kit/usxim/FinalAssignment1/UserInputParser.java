@@ -147,7 +147,7 @@ public class UserInputParser {
                 throwErrorArgsExpected(commandArgs);
                 List<ElementaryTokenMove> placeCoords = parseCoordinateList(commandArgs);
                 if (placeCoords.size() != 2)
-                    throw new IllegalArgumentException("must provide start and end: place <m1>;<n1>:<m2>;<n2>");
+                    throw new InvalidCoordinatesException("must provide start and end: place <m1>;<n1>:<m2>;<n2>");
                 Coordinates start = placeCoords.get(0);
                 Coordinates end = placeCoords.get(1);
                 return executor.place(start, end);
