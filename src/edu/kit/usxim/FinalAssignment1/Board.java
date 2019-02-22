@@ -91,7 +91,7 @@ public class Board {
             throw new InvalidCoordinatesException("x coordinate must be smaller than " + BOARD_WIDTH);
 
         if (y > (BOARD_HEIGHT - 1))
-            throw new InvalidCoordinatesException("y coordinate must be bigger than " + BOARD_HEIGHT);
+            throw new InvalidCoordinatesException("y coordinate must be smaller than " + BOARD_HEIGHT);
     }
 
     private void throwErrorForInvalidPlacement(Coordinates start, Coordinates end) throws InvalidPlacementException,

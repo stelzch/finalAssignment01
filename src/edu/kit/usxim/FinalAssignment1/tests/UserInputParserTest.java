@@ -4,6 +4,8 @@ import edu.kit.usxim.FinalAssignment1.Coordinates;
 import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
 import edu.kit.usxim.FinalAssignment1.UserInputParser;
 import edu.kit.usxim.FinalAssignment1.exceptions.GameException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCommandException;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -49,7 +51,7 @@ class UserInputParserTest {
         String command = "commandName arg1 arg2";
         try {
             String[] result = parser.parseCommandIntoNameAndArgs(command);
-        } catch (IllegalArgumentException e) {
+        } catch (InvalidCommandException e) {
             assertTrue(e.getMessage().startsWith("invalid command format"));
             return;
         }
@@ -74,7 +76,7 @@ class UserInputParserTest {
 
         try {
             String[] result = parser.parseCommandIntoNameAndArgs(" argsonly");
-         } catch (IllegalArgumentException e) {
+         } catch (InvalidCommandException e) {
             assertTrue(e.getMessage().startsWith("invalid command format"));
             return;
         }
@@ -111,9 +113,9 @@ class UserInputParserTest {
             Coordinates result = parser.parseCoordinates("5;-5");
         };
 
-        assertThrows(IllegalArgumentException.class, parseMalformedCoordinateArg);
-        assertThrows(IllegalArgumentException.class, parseHexCoordinateArg);
-        assertThrows(IllegalArgumentException.class, parseNegativeCoordinateArg);
+        assertThrows(InvalidCoordinatesException.class, parseMalformedCoordinateArg);
+        assertThrows(InvalidCoordinatesException.class, parseHexCoordinateArg);
+        assertThrows(InvalidCoordinatesException.class, parseNegativeCoordinateArg);
     }
 
     @Test
@@ -144,7 +146,7 @@ class UserInputParserTest {
             List<ElementaryTokenMove> coordinates = parser.parseCoordinateList("5;1:23;1:4;2:");
         };
 
-        assertThrows(IllegalArgumentException.class, errorInCoordinate);
-        assertThrows(IllegalArgumentException.class, endingWithDoublecolon);
+        assertThrows(InvalidCommandException.class, errorInCoordinate);
+        assertThrows(InvalidCommandException.class, endingWithDoublecolon);
     }
 }

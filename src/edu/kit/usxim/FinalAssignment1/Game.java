@@ -18,7 +18,9 @@ public class Game implements PlayerCommandExecutor {
         /** The next move has to be a token placement */
         TOKEN_PLACEMENT_EXPECTED,
         /** The next move has to be the placement of vesta or ceres */
-        VC_MOVEMENT_EXPECTED
+        VC_MOVEMENT_EXPECTED,
+        /** The current game is finished, no moves can be made */
+        GAME_FINISHED
     }
 
     public enum GamePhase {
@@ -95,40 +97,76 @@ public class Game implements PlayerCommandExecutor {
 
         return GameState.values()[nextStateIndex];
     }
+
+    private boolean gameIsFinished() {
+        if (phase == GamePhase.PHASE_TWO
+                && currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void moveToNextPhase() {
+        state = GameState.VC_PLACEMENT_EXPECTED;
+        currentRound = 0;
+        phase = GamePhase.PHASE_TWO;
+    }
+
+    private void startNextRound() {
+        currentRound += 1;
+        state = GameState.DICE_ROLL_EXPECTED;
+    }
+
+    private boolean atEndOfPhase() {
+        return currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1);
+    }
+
     /**
      * Move the game to the next state
      */
     public void moveToNextState() {
-        state = getNextState();
+        GameState nextState = getNextState();
 
-        // Skip the VC_PLACEMENT state, as it only is expected initially
-        if (shouldMoveToNextRound()) {
-            currentRound = 0;
-            phase = GamePhase.PHASE_TWO;
+        // If the game is finished, we do not progress through states anymore
+        if (gameIsFinished() && nextState == GameState.GAME_FINISHED) {
+            state = GameState.GAME_FINISHED;
             return;
         }
 
-        boolean vcStillMovable;
-        try {
-            vcStillMovable = vcCanStillMove();
-        } catch (InvalidCoordinatesException e) {
-            // This happens when VC is not yet placed. Just default it to true
-            vcStillMovable = true;
-        }
-        if (state == GameState.VC_MOVEMENT_EXPECTED && !vcStillMovable) {
-            // Vesta or Ceres cant move, so skip this step
-            moveToNextState();
-            return;
+        if (nextState == GameState.GAME_FINISHED) {
+            // A round has been completed
+
+            if (atEndOfPhase()) {
+                // This was the last round of the current phase
+                moveToNextPhase();
+            } else {
+                // Just start the next round
+                startNextRound();
+            }
+        } else {
+
+            if (nextState == GameState.VC_MOVEMENT_EXPECTED && vcCanStillMove() == false) {
+                // Skip it
+                if (gameIsFinished() || atEndOfPhase()) {
+                    moveToNextPhase();
+                } else {
+                    state = GameState.DICE_ROLL_EXPECTED;
+                }
+                return;
+            }
+
+            state = nextState;
         }
 
-        if (state == GameState.VC_PLACEMENT_EXPECTED) {
-            state = GameState.DICE_ROLL_EXPECTED;
-            currentRound += 1;
-        }
     }
 
-    private boolean vcCanStillMove() throws InvalidCoordinatesException {
-        return natureTokenSet.getNumOfReachableFields(phase) > 0;
+    private boolean vcCanStillMove() {
+        try {
+            return natureTokenSet.getNumOfReachableFields(phase) > 0;
+        } catch (InvalidCoordinatesException e) {
+            return true;
+        }
     }
 
     /**
@@ -164,7 +202,7 @@ public class Game implements PlayerCommandExecutor {
      * @throws IllegalArgumentException if the anticipated token size does not match with the last dice roll
      * @throws IllegalArgumentException if there is no token left that matches the anticipated size
      */
-    private Token getTokenForDiceNumber(int anticipatedTokenSize) {
+    private Token getTokenForDiceNumber(int anticipatedTokenSize) throws InvalidPlacementException {
         throwErrorIfDiceNumberUnset();
         List<Token> availableTokens;
         try {
@@ -179,7 +217,7 @@ public class Game implements PlayerCommandExecutor {
                 }
             }
 
-            throw new IllegalArgumentException("no token of that size left, currently available: " + sb.toString());
+            throw new InvalidPlacementException("no token of that size left, currently available: " + sb.toString());
         } catch (InvalidDiceNumberException e) {
             throw new IllegalStateException("the last dice roll was invalid");
         }

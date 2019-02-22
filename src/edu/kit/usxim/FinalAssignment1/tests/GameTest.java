@@ -47,6 +47,18 @@ class GameTest {
         }
 
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
+        g.setVC(new Coordinates(2, 2));
+
+        for (int i=1; i <= 6; i++) {
+            System.out.println("Round " + i);
+            assertEquals(Game.GameState.DICE_ROLL_EXPECTED, g.getState());
+            g.moveToNextState();
+            assertEquals(Game.GameState.TOKEN_PLACEMENT_EXPECTED, g.getState());
+            g.moveToNextState();
+            assertEquals(Game.GameState.VC_MOVEMENT_EXPECTED, g.getState());
+            g.moveToNextState();
+        }
+        assertEquals(Game.GameState.GAME_FINISHED, g.getState());
 
     }
 
@@ -143,7 +155,7 @@ class GameTest {
             g.place(new Coordinates(0, 0), new Coordinates(2, 0));
         };
 
-        assertThrows(IllegalArgumentException.class, placeTokenLongerThanRoll);
+        assertThrows(InvalidPlacementException.class, placeTokenLongerThanRoll);
         assertDoesNotThrow(placeTokenFittingRoll);
     }
 
@@ -307,7 +319,7 @@ class GameTest {
 
         try {
             g.roll("2");
-        } catch (IllegalStateException e) {
+        } catch (InvalidCommandException e) {
             fail("as vesta can not be moved the vesta movement step should be skipped");
         }
     }
