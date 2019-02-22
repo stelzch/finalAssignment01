@@ -40,6 +40,7 @@ public class Game implements PlayerCommandExecutor {
     private GamePhase phase;
 
     private int lastDiceRoll;
+    private int lengthOfLastPlacedToken;
     private int currentRound;
 
     /**
@@ -58,6 +59,7 @@ public class Game implements PlayerCommandExecutor {
         // Make it invalid to signal no dice has been rolled yet
         lastDiceRoll = DICE_NOT_YET_ROLLED;
         currentRound = 0;
+        lengthOfLastPlacedToken = 0;
     }
 
     /**
@@ -86,11 +88,6 @@ public class Game implements PlayerCommandExecutor {
         return state;
     }
 
-    private boolean shouldMoveToNextRound() {
-        return state == GameState.VC_PLACEMENT_EXPECTED
-                && currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1);
-    }
-
     private GameState getNextState() {
         int currentStateIndex = state.ordinal();
         int nextStateIndex = (currentStateIndex + 1) % GameState.values().length;
@@ -98,74 +95,44 @@ public class Game implements PlayerCommandExecutor {
         return GameState.values()[nextStateIndex];
     }
 
-    private boolean gameIsFinished() {
-        if (phase == GamePhase.PHASE_TWO
-                && currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void moveToNextPhase() {
-        state = GameState.VC_PLACEMENT_EXPECTED;
-        currentRound = 0;
-        phase = GamePhase.PHASE_TWO;
-    }
-
-    private void startNextRound() {
-        currentRound += 1;
-        state = GameState.DICE_ROLL_EXPECTED;
+    private boolean atEndOfRound() {
+        return (state == GameState.TOKEN_PLACEMENT_EXPECTED && !vcCanStillMove())
+                || (state == GameState.VC_MOVEMENT_EXPECTED);
     }
 
     private boolean atEndOfPhase() {
-        return currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1);
+        return atEndOfRound() && (currentRound == (NUMBER_OF_ROUNDS_PER_PHASE - 1));
+    }
+
+    private boolean vcCanStillMove() {
+        try {
+            System.out.println("VC still movable");
+            return natureTokenSet.getNumOfReachableFields(phase) > 0;
+        } catch (InvalidCoordinatesException e) {
+            System.out.println("VC unable to move");
+            return true;
+        }
+    }
+
+    private boolean noMovesLeft() {
+        return (phase == GamePhase.PHASE_TWO) && atEndOfPhase();
     }
 
     /**
      * Move the game to the next state
      */
     public void moveToNextState() {
-        GameState nextState = getNextState();
-
-        // If the game is finished, we do not progress through states anymore
-        if (gameIsFinished() && nextState == GameState.GAME_FINISHED) {
+        if (noMovesLeft()) {
             state = GameState.GAME_FINISHED;
-            return;
-        }
-
-        if (nextState == GameState.GAME_FINISHED) {
-            // A round has been completed
-
-            if (atEndOfPhase()) {
-                // This was the last round of the current phase
-                moveToNextPhase();
-            } else {
-                // Just start the next round
-                startNextRound();
-            }
+        } else if (atEndOfPhase() && phase == GamePhase.PHASE_ONE) {
+            state = GameState.VC_PLACEMENT_EXPECTED;
+            phase = GamePhase.PHASE_TWO;
+            currentRound = 0;
+        } else if (atEndOfRound()) {
+            state = GameState.DICE_ROLL_EXPECTED;
+            currentRound += 1;
         } else {
-
-            if (nextState == GameState.VC_MOVEMENT_EXPECTED && vcCanStillMove() == false) {
-                // Skip it
-                if (gameIsFinished() || atEndOfPhase()) {
-                    moveToNextPhase();
-                } else {
-                    state = GameState.DICE_ROLL_EXPECTED;
-                }
-                return;
-            }
-
-            state = nextState;
-        }
-
-    }
-
-    private boolean vcCanStillMove() {
-        try {
-            return natureTokenSet.getNumOfReachableFields(phase) > 0;
-        } catch (InvalidCoordinatesException e) {
-            return true;
+            state = getNextState();
         }
     }
 
@@ -271,6 +238,8 @@ public class Game implements PlayerCommandExecutor {
         board.placeToken(t, new Coordinates(x, y), or);
         getTokenSetForPhase().removeToken(t);
 
+        lengthOfLastPlacedToken = t.getSize();
+
         moveToNextState();
 
         return "OK";
@@ -284,8 +253,9 @@ public class Game implements PlayerCommandExecutor {
 
 
         int stepsRequiredForMove = natureTokenSet.countStepsAndCheckIfLegal(phase, moves);
-        if (stepsRequiredForMove > lastDiceRoll)
-            throw new InvalidMoveException("this step requires a dice roll of " + stepsRequiredForMove);
+        if (stepsRequiredForMove > lengthOfLastPlacedToken)
+            throw new InvalidMoveException("this move consists of " + stepsRequiredForMove
+                + "elementary moves, but the last placed token was only " + lengthOfLastPlacedToken + " fields long");
 
         if (stepsRequiredForMove == 0)
             throw new InvalidMoveException("need to specify at least move");

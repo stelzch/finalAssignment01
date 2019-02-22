@@ -15,8 +15,8 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         UserInputParser parser = new UserInputParser();
 
-        while (sc.hasNext()) {
-            String line = sc.nextLine();
+        while (true) {
+            String line = Terminal.readLine();
 
             try {
                 Terminal.printLine(parser.parseInput(line));

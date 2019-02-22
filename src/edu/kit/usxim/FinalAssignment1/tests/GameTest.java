@@ -320,10 +320,11 @@ class GameTest {
 
         g.roll("2");
         g.place(new Coordinates(0, 1), new Coordinates(0, 3));
+        System.out.println(g.print());
 
         try {
             g.roll("2");
-        } catch (InvalidCommandException e) {
+        } catch (GameException e) {
             fail("as vesta can not be moved the vesta movement step should be skipped");
         }
     }

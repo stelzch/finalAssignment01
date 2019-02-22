@@ -61,13 +61,13 @@ class UserInputParserTest {
 
     @Test
     public void testEmptyCommandParsing() throws GameException {
-        UserInputParser parser = new UserInputParser();
+        Executable runEmptyCommand = () -> {
+            UserInputParser parser = new UserInputParser();
 
-        String[] result = parser.parseCommandIntoNameAndArgs("");
+            String[] result = parser.parseCommandIntoNameAndArgs("");
+        };
 
-        assertEquals(2, result.length);
-        assertEquals("", result[0]);
-        assertEquals("", result[1]);
+        assertThrows(InvalidCommandException.class, runEmptyCommand);
     }
 
     @Test

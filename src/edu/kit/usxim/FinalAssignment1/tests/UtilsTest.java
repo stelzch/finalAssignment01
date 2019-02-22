@@ -3,6 +3,7 @@ package edu.kit.usxim.FinalAssignment1.tests;
 import edu.kit.usxim.FinalAssignment1.Coordinates;
 import edu.kit.usxim.FinalAssignment1.Token;
 import edu.kit.usxim.FinalAssignment1.Utils;
+import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class UtilsTest {
 
     @Test
-    public void testBasicLineOrientation() {
+    public void testBasicLineOrientation() throws InvalidCoordinatesException {
         assertEquals(Token.Orientation.VERTICAL,
                 Utils.getLineOrientation(new Coordinates(2, 2), new Coordinates(2, 9)));
         assertEquals(Token.Orientation.HORIZONTAL,
@@ -22,7 +23,7 @@ class UtilsTest {
     }
 
     @Test
-    public void testBackwardsLineOrientation() {
+    public void testBackwardsLineOrientation() throws InvalidCoordinatesException {
         Token.Orientation expected = Token.Orientation.HORIZONTAL;
         Token.Orientation actual = Utils.getLineOrientation(new Coordinates(4, 4), new Coordinates(-40, 4));
 
@@ -36,11 +37,11 @@ class UtilsTest {
             or = Utils.getLineOrientation(new Coordinates(2, 2), new Coordinates(6, 6));
         };
 
-        assertThrows(IllegalArgumentException.class, getOrientationOfTiltedLine);
+        assertThrows(InvalidCoordinatesException.class, getOrientationOfTiltedLine);
     }
 
     @Test
-    public void testLineLengths() {
+    public void testLineLengths() throws InvalidCoordinatesException {
         assertEquals(7, Utils.getStraightLineLength(new Coordinates(4, 3), new Coordinates(4, 9)));
 
         assertEquals(901, Utils.getStraightLineLength(new Coordinates(0, 0),

@@ -172,10 +172,11 @@ public class NatureTokenSet {
             throwErrorIfDestinationOccupied(nextMove, phase);
             throwErrorIfCoordinatesInvalid(nextMove);
 
-            if (!nextMove.equals(lastMove))
-                stepsNeeded++;
+            if (nextMove.equals(lastMove))
+                throw new InvalidMoveException("can not move to same field twice");
 
             lastMove = nextMove;
+            stepsNeeded++;
         }
 
         return stepsNeeded;

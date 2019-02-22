@@ -10,6 +10,10 @@ import java.util.List;
 
 public class UserInputParser {
     private static final String COMMAND_ARG_SEPERATOR = " ";
+    private static final String REGEX_SINGLE_COORDINATE_TUPLE = "(0|(-?[1-9][0-9]*));(0|(-?[1-9][0-9]*))";
+    private static final String REGEX_COORDINATE_TUPLE_LIST
+            = "^" + REGEX_SINGLE_COORDINATE_TUPLE + "(:" + REGEX_SINGLE_COORDINATE_TUPLE + ")*$";
+    private static final String REGEX_COMMAND = "^\\S+( \\S+)?\n?$";
 
     private PlayerCommandExecutor executor;
 
@@ -29,6 +33,16 @@ public class UserInputParser {
             throw new InvalidCommandException("did not expect any arguments");
     }
 
+    private void throwErrorArgsExpected(String args) throws InvalidCommandException {
+        if (args.isEmpty())
+            throw new InvalidCommandException("this command needs an argument");
+    }
+
+    private void throwErrorNegativeNull(String param) throws InvalidCoordinatesException {
+        if (param.equals("-0"))
+            throw new InvalidCoordinatesException("not a number: -0");
+    }
+
     /**
      * Parse a coordinate tuple into integers
      * @param input the user input of two numbers separated by a semicolon
@@ -36,13 +50,15 @@ public class UserInputParser {
      * @throws InvalidCoordinatesException if the provided input is malformed
      */
     public Coordinates parseCoordinates(String input) throws InvalidCoordinatesException {
-        if (!input.matches("-?[0-9]+;-?[0-9]+"))
+        if (!input.matches("^" + REGEX_SINGLE_COORDINATE_TUPLE + "$"))
             throwErrorForInvalidCoordinate(input);
 
         String[] parts = input.split(";");
         if (parts.length != 2)
             throwErrorForInvalidCoordinate(input);
 
+        throwErrorNegativeNull(parts[0]);
+        throwErrorNegativeNull(parts[1]);
         try {
             int coordY = Integer.parseInt(parts[0]);
             int coordX = Integer.parseInt(parts[1]);
@@ -64,7 +80,7 @@ public class UserInputParser {
      */
     public List<ElementaryTokenMove> parseCoordinateList(String input)
             throws InvalidCoordinatesException, InvalidCommandException {
-        if (!input.matches("-?[0-9]+;-?[0-9]+(:-?[0-9]+;-?[0-9]+)*"))
+        if (!input.matches(REGEX_COORDINATE_TUPLE_LIST))
             throw new InvalidCommandException("invalid coordinate format - must be m1;n1:m2;n2 and so on");
 
         String[] coordinateList = input.split(":");
@@ -77,7 +93,8 @@ public class UserInputParser {
     }
 
     private void throwErrorForInvalidCommandFormat() throws InvalidCommandException {
-        throw new InvalidCommandException("invalid command format - should be this: <commandName> <argument(s)>");
+        throw new InvalidCommandException("invalid command format - should be the command name and optional arguments"
+            + " separated by a single space");
     }
 
     /**
@@ -88,6 +105,9 @@ public class UserInputParser {
     public String[] parseCommandIntoNameAndArgs(String input) throws InvalidCommandException {
         String[] result = new String[2];
         String[] commandSegments = input.split(COMMAND_ARG_SEPERATOR);
+
+        if (!input.matches(REGEX_COMMAND))
+            throwErrorForInvalidCommandFormat();
 
         if (commandSegments.length > 2)
             throwErrorForInvalidCommandFormat();
@@ -106,7 +126,6 @@ public class UserInputParser {
      * @param line the line the user inputs
      * @return any output the routine provides
      * @throws GameException if something goes wrong
-     * @throws IllegalAccessException if a field is overwritten
      */
     public String parseInput(String line) throws GameException {
         String[] commandParts = parseCommandIntoNameAndArgs(line);
@@ -118,11 +137,14 @@ public class UserInputParser {
                 throwErrorArgsExpectedEmpty(commandArgs);
                 return executor.print();
             case "state":
+                throwErrorArgsExpected(commandArgs);
                 Coordinates coords = parseCoordinates(commandArgs);
                 return executor.state(coords);
             case "roll":
+                throwErrorArgsExpected(commandArgs);
                 return executor.roll(commandArgs);
             case "place":
+                throwErrorArgsExpected(commandArgs);
                 List<ElementaryTokenMove> placeCoords = parseCoordinateList(commandArgs);
                 if (placeCoords.size() != 2)
                     throw new IllegalArgumentException("must provide start and end: place <m1>;<n1>:<m2>;<n2>");
@@ -130,9 +152,11 @@ public class UserInputParser {
                 Coordinates end = placeCoords.get(1);
                 return executor.place(start, end);
             case "move":
+                throwErrorArgsExpected(commandArgs);
                 List<ElementaryTokenMove> moves = parseCoordinateList(commandArgs);
                 return executor.move(moves);
             case "set-vc":
+                throwErrorArgsExpected(commandArgs);
                 Coordinates target = parseCoordinates(commandArgs);
                 return executor.setVC(target);
             case "reset":
