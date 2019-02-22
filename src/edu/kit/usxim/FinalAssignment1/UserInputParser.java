@@ -142,6 +142,9 @@ public class UserInputParser {
             case "quit":
                 throwErrorArgsExpectedEmpty(commandArgs);
                 throw new ProgramQuitRequestException("user requested exit");
+            case "show-result":
+                throwErrorArgsExpectedEmpty(commandArgs);
+                return String.valueOf(this.executor.result());
             default:
                 throw new InvalidCommandException("did not recognise command: " + commandName);
         }
