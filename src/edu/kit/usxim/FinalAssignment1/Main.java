@@ -2,6 +2,7 @@ package edu.kit.usxim.FinalAssignment1;
 
 import edu.kit.informatik.Terminal;
 import edu.kit.usxim.FinalAssignment1.exceptions.GameException;
+import edu.kit.usxim.FinalAssignment1.exceptions.ProgramQuitRequestException;
 
 import java.util.Scanner;
 
@@ -19,6 +20,8 @@ public class Main {
 
             try {
                 Terminal.printLine(parser.parseInput(line));
+            } catch (ProgramQuitRequestException e) {
+                break;
             } catch (GameException e) {
                 Terminal.printError(e.getMessage());
             }

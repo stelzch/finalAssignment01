@@ -62,9 +62,9 @@ public class Game implements PlayerCommandExecutor {
      * If the current state does not match the expectedStateForCommand, it throws an exception
      * @param expectedStateForCommand the state the game should be in in order for the command to be run properly
      */
-    private void throwErrorIfRequestStateMismatch(GameState expectedStateForCommand) {
+    private void throwErrorIfRequestStateMismatch(GameState expectedStateForCommand) throws InvalidCommandException {
         if (expectedStateForCommand != state) {
-            throw new IllegalStateException("this command was not expected");
+            throw new InvalidCommandException("this command was not expected");
         }
     }
 
@@ -206,7 +206,7 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String roll(String symbol) throws InvalidDiceNumberException {
+    public String roll(String symbol) throws InvalidDiceNumberException, InvalidCommandException {
         throwErrorIfRequestStateMismatch(GameState.DICE_ROLL_EXPECTED);
 
         lastDiceRoll = parseDiceSymbol(symbol);
@@ -218,7 +218,7 @@ public class Game implements PlayerCommandExecutor {
 
     @Override
     public String place(Coordinates start, Coordinates end)
-            throws InvalidPlacementException, InvalidCoordinatesException {
+            throws InvalidPlacementException, InvalidCoordinatesException, InvalidCommandException {
         throwErrorIfRequestStateMismatch(GameState.TOKEN_PLACEMENT_EXPECTED);
         throwErrorIfDiceNumberUnset();
 
@@ -239,7 +239,7 @@ public class Game implements PlayerCommandExecutor {
     }
 
     @Override
-    public String move(List<ElementaryTokenMove> moves) throws InvalidMoveException, InvalidCoordinatesException {
+    public String move(List<ElementaryTokenMove> moves) throws InvalidMoveException, InvalidCoordinatesException, InvalidCommandException {
         throwErrorIfRequestStateMismatch(GameState.VC_MOVEMENT_EXPECTED);
         throwErrorIfDiceNumberUnset();
 

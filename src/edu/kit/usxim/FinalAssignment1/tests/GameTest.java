@@ -29,7 +29,7 @@ class GameTest {
     }
 
     @Test
-    public void testStateTransition() throws InvalidPlacementException, IllegalAccessException, InvalidCoordinatesException {
+    public void testStateTransition() throws GameException {
         Game g = new Game();
 
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
@@ -51,7 +51,7 @@ class GameTest {
     }
 
     @Test
-    public void testBasicVestaPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidCoordinatesException {
+    public void testBasicVestaPlacement() throws GameException {
         Game g = new Game();
         g.setVC(new Coordinates(3, 3));
 
@@ -59,7 +59,7 @@ class GameTest {
     }
 
     @Test
-    public void testBasicPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidPlacementException, InvalidCoordinatesException, InvalidDiceNumberException {
+    public void testBasicPlacement() throws GameException {
         Game g = new Game();
         assertEquals(Game.GameState.VC_PLACEMENT_EXPECTED, g.getState());
         g.setVC(new Coordinates( 3, 2));
@@ -84,7 +84,7 @@ class GameTest {
         }
 
     @Test
-    public void testDawnPlacement() throws InvalidPlacementException, IllegalAccessException, InvalidCoordinatesException, InvalidDiceNumberException {
+    public void testDawnPlacement() throws GameException {
         Game g = new Game();
         g.setVC(new Coordinates( 2, 5));
         g.roll("DAWN");
@@ -180,7 +180,7 @@ class GameTest {
     }
 
     @Test
-    public void testSimpleMovement() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException, InvalidCoordinatesException, InvalidDiceNumberException {
+    public void testSimpleMovement() throws GameException {
         Game g = new Game();
         List<ElementaryTokenMove> moveOneStepForward = new ArrayList<>();
         List<ElementaryTokenMove> moveOneStepBack = new ArrayList<>();
@@ -204,7 +204,7 @@ class GameTest {
     }
 
     @Test
-    public void testMultiplePhases() throws InvalidPlacementException, InvalidMoveException, IllegalAccessException, InvalidCoordinatesException, InvalidDiceNumberException {
+    public void testMultiplePhases() throws GameException {
         Game g = new Game();
         List<ElementaryTokenMove> moveOneStepForward = new ArrayList<>();
         List<ElementaryTokenMove> moveOneStepBack = new ArrayList<>();
@@ -261,7 +261,7 @@ class GameTest {
     }
 
     @Test
-    public void testVestaMovementMinimum() throws InvalidPlacementException, IllegalAccessException {
+    public void testVestaMovementMinimum() throws GameException {
         Executable moveWithEmptyList = () -> {
             Game g = new Game();
             g.setVC(new Coordinates(0, 0));
@@ -294,7 +294,7 @@ class GameTest {
         return list;
     }
     @Test
-    public void testImmovableVesta() throws InvalidPlacementException, IllegalAccessException, InvalidMoveException, InvalidDiceNumberException, InvalidCoordinatesException {
+    public void testImmovableVesta() throws GameException {
         Game g = new Game();
         g.setVC(new Coordinates(0, 1));
         g.roll("2");

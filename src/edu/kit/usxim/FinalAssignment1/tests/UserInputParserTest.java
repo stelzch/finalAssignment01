@@ -3,6 +3,7 @@ package edu.kit.usxim.FinalAssignment1.tests;
 import edu.kit.usxim.FinalAssignment1.Coordinates;
 import edu.kit.usxim.FinalAssignment1.ElementaryTokenMove;
 import edu.kit.usxim.FinalAssignment1.UserInputParser;
+import edu.kit.usxim.FinalAssignment1.exceptions.GameException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserInputParserTest {
 
     @Test
-    public void testSimplePrint() throws Exception {
+    public void testSimplePrint() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         String output = parser.parseInput("print");
@@ -22,7 +23,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testCommandParsing() {
+    public void testCommandParsing() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         String[] result = parser.parseCommandIntoNameAndArgs("print herearetheargs");
@@ -32,7 +33,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testCommandParsingWithoutArgs() {
+    public void testCommandParsingWithoutArgs() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         String[] result = parser.parseCommandIntoNameAndArgs("onlyacommand");
@@ -42,7 +43,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testCommandParsingWithManySpaceArgs() {
+    public void testCommandParsingWithManySpaceArgs() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         String command = "commandName arg1 arg2";
@@ -57,7 +58,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testEmptyCommandParsing() {
+    public void testEmptyCommandParsing() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         String[] result = parser.parseCommandIntoNameAndArgs("");
@@ -68,7 +69,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testEmptyCommandButArgsparsing() {
+    public void testEmptyCommandButArgsparsing() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         try {
@@ -82,7 +83,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testCoordinateArg() {
+    public void testCoordinateArg() throws GameException  {
         UserInputParser parser = new UserInputParser();
 
         Coordinates result = parser.parseCoordinates("5;33");
@@ -91,7 +92,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testIllegalCoordinateArg() {
+    public void testIllegalCoordinateArg() throws GameException {
         Executable parseMalformedCoordinateArg = () -> {
             UserInputParser parser = new UserInputParser();
 
@@ -116,7 +117,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testParseCoordinateList() {
+    public void testParseCoordinateList() throws GameException {
         UserInputParser parser = new UserInputParser();
 
         List<ElementaryTokenMove> coordinates = parser.parseCoordinateList("5;1:23;1:4;2");
@@ -130,7 +131,7 @@ class UserInputParserTest {
     }
 
     @Test
-    public void testInvalidCoordinateList() {
+    public void testInvalidCoordinateList() throws GameException {
         Executable errorInCoordinate = () -> {
             UserInputParser parser = new UserInputParser();
 
