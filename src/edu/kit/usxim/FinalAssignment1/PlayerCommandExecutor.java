@@ -55,4 +55,11 @@ public interface PlayerCommandExecutor {
      * @throws GameException if something goes wrong
      */
     String move(List<ElementaryTokenMove> moves) throws GameException;
+
+    /**
+     * Get the result of the game
+     * @return the score of the current game
+     * @throws GameException if the command is unexpected or the score calculation fails
+     */
+    int result() throws GameException;
 }

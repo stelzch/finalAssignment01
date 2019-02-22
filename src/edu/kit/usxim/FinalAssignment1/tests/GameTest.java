@@ -347,4 +347,14 @@ class GameTest {
         assertThrows(InvalidDiceNumberException.class, sevenInsteadOfDawn);
         assertThrows(InvalidDiceNumberException.class, glibberishDiceNumber);
     }
+
+    @Test
+    public void testResultOfUnfinishedGame() {
+        Executable invalidStateForResultRequest = () -> {
+            Game g = new Game();
+            int res = g.result();
+        };
+
+        assertThrows(InvalidCommandException.class, invalidStateForResultRequest);
+    }
 }

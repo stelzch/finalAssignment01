@@ -296,4 +296,12 @@ public class Game implements PlayerCommandExecutor {
 
         return "OK";
     }
+
+    @Override
+    public int result() throws GameException {
+        throwErrorIfRequestStateMismatch(GameState.GAME_FINISHED);
+
+        return natureTokenSet.getScore();
+    }
+
 }

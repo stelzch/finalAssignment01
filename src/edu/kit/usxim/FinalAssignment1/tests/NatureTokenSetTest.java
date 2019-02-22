@@ -27,7 +27,6 @@ class NatureTokenSetTest {
         assertEquals('C', b.getTokenAt(new Coordinates(2, 4)));
     }
 
-
     @Test
     public void testMultipleVestaPlacement() throws InvalidPlacementException, InvalidCoordinatesException {
         Board b = new Board();
@@ -229,5 +228,45 @@ class NatureTokenSetTest {
             return;
         }
         fail("should throw error as field is adjacent to vesta, not ceres");
+    }
+
+    @Test
+    public void testResultCalc() throws GameException {
+        Board b = new Board();
+        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 7), new Coordinates(0, 3), Token.Orientation.HORIZONTAL);
+        b.placeToken(new Token(Token.Type.MISSION_CONTROL, 3), new Coordinates(6, 0), Token.Orientation.VERTICAL);
+        b.setTokenAt(new Coordinates(4, 2), '+');
+
+        NatureTokenSet nts = new NatureTokenSet(b);
+        Coordinates vestaPos = new Coordinates(5, 2);
+        Coordinates ceresPos = new Coordinates(5, 1);
+        nts.placeVC(Game.GamePhase.PHASE_ONE, vestaPos);
+        nts.placeVC(Game.GamePhase.PHASE_TWO, ceresPos);
+
+        assertEquals("------+--------\n" +
+                "-----C+--------\n" +
+                "----+V+--------\n" +
+                "+++++++--------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------\n" +
+                "---------------", b.toString());
+
+        int freeFieldsVesta = 0;
+        int freeFieldsCeres = 15;
+
+        assertEquals(freeFieldsVesta, nts.getNumOfReachableFields(Game.GamePhase.PHASE_ONE));
+        assertEquals(freeFieldsCeres, nts.getNumOfReachableFields(Game.GamePhase.PHASE_TWO));
+
+        int score = Math.max(freeFieldsCeres, freeFieldsVesta) +
+                (Math.max(freeFieldsCeres, freeFieldsVesta) -
+                        Math.min(freeFieldsCeres, freeFieldsVesta));
+        assertEquals(30, score);
+
+        int computedScore = nts.getScore();
+        assertEquals(score, computedScore);
     }
 }

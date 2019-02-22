@@ -1,6 +1,7 @@
 package edu.kit.usxim.FinalAssignment1;
 
 
+import edu.kit.usxim.FinalAssignment1.exceptions.GameException;
 import edu.kit.usxim.FinalAssignment1.exceptions.InvalidCoordinatesException;
 import edu.kit.usxim.FinalAssignment1.exceptions.InvalidMoveException;
 import edu.kit.usxim.FinalAssignment1.exceptions.InvalidPlacementException;
@@ -217,5 +218,20 @@ public class NatureTokenSet {
         FreeFieldCounter counter = new FreeFieldCounter(board, getCoordinatesRelevantForPhase(phase));
 
         return counter.countReachableTokens();
+    }
+
+    /**
+     * @return the current game score
+     */
+    public int getScore() throws GameException {
+        throwErrorIfNotYetPlaced(Game.GamePhase.PHASE_ONE);
+        throwErrorIfNotYetPlaced(Game.GamePhase.PHASE_TWO);
+        int freeFieldsVesta = getNumOfReachableFields(Game.GamePhase.PHASE_ONE);
+        int freeFieldsCeres = getNumOfReachableFields(Game.GamePhase.PHASE_TWO);
+
+        int score = Math.max(freeFieldsCeres, freeFieldsVesta)
+                + Math.max(freeFieldsCeres, freeFieldsVesta)
+                - Math.min(freeFieldsCeres, freeFieldsVesta);
+        return score;
     }
 }
