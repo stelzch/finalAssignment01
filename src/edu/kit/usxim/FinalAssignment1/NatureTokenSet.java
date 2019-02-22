@@ -221,6 +221,7 @@ public class NatureTokenSet {
     }
 
     /**
+     * @throws GameException if VC are not yet placed
      * @return the current game score
      */
     public int getScore() throws GameException {
