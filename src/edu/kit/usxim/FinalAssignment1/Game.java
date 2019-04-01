@@ -106,10 +106,8 @@ public class Game implements PlayerCommandExecutor {
 
     private boolean vcCanStillMove() {
         try {
-            System.out.println("VC still movable");
             return natureTokenSet.getNumOfReachableFields(phase) > 0;
         } catch (InvalidCoordinatesException e) {
-            System.out.println("VC unable to move");
             return true;
         }
     }
